@@ -14,19 +14,21 @@ model agendamento {
 }
 
 model cliente {
-  idCliente    Int     @id @default(autoincrement())
-  nomeCliente  String  @db.VarChar(150)
-  telCliente   String? @db.VarChar(11)
-  cpfCliente   String? @db.VarChar(15)
-  emailCliente String? @db.VarChar(255)
+  idCliente       Int     @id @default(autoincrement())
+  nomeCliente     String  @db.VarChar(150)
+  telCliente      String? @db.VarChar(11)
+  cpfCliente      String? @db.VarChar(15)
+  emailCliente    String? @db.VarChar(255)
+  dataNascCliente String  @db.VarChar(10)
 }
 
 model prestador {
-  idPrestador    Int    @id @default(autoincrement())
-  nomePrestador  String @db.VarChar(150)
-  telPrestador   String @db.VarChar(11)
-  cpfPrestador   String @db.VarChar(15)
-  emailPrestador String @db.VarChar(255)
+  idPrestador       Int     @id @default(autoincrement())
+  nomePrestador     String  @db.VarChar(150)
+  telPrestador      String  @db.VarChar(11)
+  cpfPrestador      String  @db.VarChar(15)
+  emailPrestador    String  @db.VarChar(255)
+  dataNascPrestador String? @db.VarChar(10)
 }
 
 model servico {
@@ -35,4 +37,20 @@ model servico {
   precoServico     Float   @db.Float
   descricaoServico String? @db.VarChar(200)
   categoriaServico String  @db.VarChar(100)
+}
+
+model empresa {
+  idEmpresa   Int    @id @default(autoincrement())
+  cnpjEmpresa String @db.VarChar(25)
+  nomeEmpresa String @db.VarChar(255)
+  telEmpresa  String @db.VarChar(11)
+}
+
+model endereco {
+  idEndereco      Int     @id @default(autoincrement())
+  cepEndereco     String  @db.VarChar(9)
+  nomeRuaEndereco String  @db.VarChar(150)
+  numEndereco     String  @db.VarChar(10)
+  bairroEndereco  String? @db.VarChar(255)
+  cidadeEndereco  String? @db.VarChar(150)
 }
