@@ -21,17 +21,18 @@ model cliente {
   emailCliente String? @db.VarChar(255)
 }
 
-model optService {
-  idOptService     Int      @id @default(autoincrement())
-  nameService      String   @db.VarChar(100)
-  precoService     Decimal? @db.Decimal(5, 2)
-  descricaoService String?  @db.VarChar(255)
-}
-
 model prestador {
   idPrestador    Int    @id @default(autoincrement())
   nomePrestador  String @db.VarChar(150)
   telPrestador   String @db.VarChar(11)
   cpfPrestador   String @db.VarChar(15)
-  emailPrestador String @db.VarChar(150)
+  emailPrestador String @db.VarChar(255)
+}
+
+model servico {
+  idServico        Int     @id @default(autoincrement())
+  nomeServico      String  @db.VarChar(50)
+  precoServico     Float   @db.Float
+  descricaoServico String? @db.VarChar(200)
+  categoriaServico String  @db.VarChar(100)
 }
