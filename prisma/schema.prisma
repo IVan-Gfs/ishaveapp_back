@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model agendamento {
@@ -20,6 +21,11 @@ model cliente {
   cpfCliente      String? @db.VarChar(15)
   emailCliente    String? @db.VarChar(255)
   dataNascCliente String  @db.VarChar(10)
+  idEndereco      Int
+
+  endereco endereco @relation(fields: [idEndereco], references: [idEndereco])
+
+  @@index([idEndereco])
 }
 
 model prestador {
@@ -47,10 +53,11 @@ model empresa {
 }
 
 model endereco {
-  idEndereco      Int     @id @default(autoincrement())
-  cepEndereco     String  @db.VarChar(9)
-  nomeRuaEndereco String  @db.VarChar(150)
-  numEndereco     String  @db.VarChar(10)
-  bairroEndereco  String? @db.VarChar(255)
-  cidadeEndereco  String? @db.VarChar(150)
+  idEndereco      Int       @id @default(autoincrement())
+  cepEndereco     String    @db.VarChar(9)
+  nomeRuaEndereco String    @db.VarChar(150)
+  numEndereco     String    @db.VarChar(10)
+  bairroEndereco  String?   @db.VarChar(255)
+  cidadeEndereco  String?   @db.VarChar(150)
+  cliente         cliente[]
 }
