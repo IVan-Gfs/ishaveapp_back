@@ -4,20 +4,20 @@ const prisma = new PrismaClient;
 
 module.exports = {
     async store(req, res){
-        const data = req.body.dataAgendamento.replaceAll('/','-')
-        // O problema aqui é que o prisma não aceita string em um campo que está definido como datatime.
-        // o padrão do mysql é "-", mas isso provavelmente virá com "/"
 
+        const data = req.body.dataAgendamento.replaceAll('/',' ') 
+        //junta data e hora e salvo num só campo no banco
+        const dataHorarioStr = data +" "+req.body.horarioAgendamento+" UTC-3" 
+        const dataHorario = new Date(dataHorarioStr)
         
         const agendamento = await prisma.agendamento.create({
             data:{
-                // Junta data e horario para um campo só na base de dados
-                horarioAgendamento: data +" "+ req.body.horarioAgendamento,
+                horarioAgendamento: dataHorario,
                 idCliente: req.body.idCliente,
                 idSvcPtd: req.body.idSvcPtd 
             }
         })    
-        res.json(agendamento)
+        res.json(agendamento) 
     },
 
     async index(req, res){
