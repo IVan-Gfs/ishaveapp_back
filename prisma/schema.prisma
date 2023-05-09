@@ -13,9 +13,12 @@ model agendamento {
   horarioAgendamento DateTime? @db.DateTime(0)
   idCliente          Int
   idSvcPtd           Int
+  enderecoId         Int
   servicoPrestador servico_prestador @relation(fields: [idSvcPtd], references: [idSvcPtd])
   @@index([idCliente])
   @@index([idSvcPtd])
+  endereco endereco @relation(fields: [enderecoId], references: [idEndereco])
+  @@index([enderecoId])
 }
 
 model cliente {
@@ -35,6 +38,7 @@ model prestador {
   emailPrestador    String  @db.VarChar(255)
   dataNascPrestador String? @db.VarChar(10)
   servicos servico_prestador[]
+  usuario usuarios[]
 
   
 }
@@ -62,15 +66,34 @@ model endereco {
   numEndereco     String  @db.VarChar(10)
   bairroEndereco  String? @db.VarChar(255)
   cidadeEndereco  String? @db.VarChar(150)
+  usuario usuarios[]
+  agendamento agendamento[]
+ 
+ 
 }
 
 model servico_prestador {
   idSvcPtd    Int     @id @default(autoincrement())
   servicoId   Int 
   prestadorId Int 
-  prestador prestador @relation(fields: [prestadorId], references: [idPrestador])
-  servico   servico   @relation(fields: [servicoId], references: [idServico])
+  prestador   prestador @relation(fields: [prestadorId], references: [idPrestador])
+  servico     servico   @relation(fields: [servicoId], references: [idServico])
   @@index([servicoId])
   @@index([prestadorId])
   agendamento agendamento[]
+}
+
+model usuarios {
+  idUsuario    Int @id @default(autoincrement())
+  nomeUsuario  String @db.VarChar(30)
+  emailUsuario String @db.VarChar(255)
+  senhaUsuario String @db.VarChar(25)
+  prestadorId  Int?
+  enderecoId Int
+  prestador   prestador? @relation(fields: [prestadorId], references: [idPrestador])
+  @@index([prestadorId])
+  endereco     endereco @relation(fields:[enderecoId], references: [idEndereco])
+  @@index([enderecoId])  
+
+  
 }
