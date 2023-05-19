@@ -104,6 +104,7 @@ model usuarios {
   @@index([enderecoId])  
   @@index([empresaId])
   session session[]
+  codAuth codAuth[]
 }
 
 model session {
@@ -119,5 +120,8 @@ model codAuth{
   idCodAuth Int @id @default(autoincrement())
   codigo    String @db.VarChar(6)
   email     String @db.VarChar(255)
+  idUsuario Int
+  usuario usuarios @relation(fields: [idUsuario], references: [idUsuario])
+  @@index([idUsuario])
   expired   Boolean? @default(false)
 }
