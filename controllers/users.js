@@ -4,13 +4,18 @@ const {transporter, gerarOTP} = require("./envmail");
 
 module.exports = {
   async register(req, res) {
+    const empresa = await prisma.empresa.create({data:req.body.empresa})
+    req.body.endereco.empresaId = empresa.idEmpresa 
+    const endereco = await prisma.endereco.create({data: req.body.endereco});
+  
     const newUser = await prisma.usuarios.create({
       data: {
-        nomeUsuario: req.body.nomeUsuario,
-        emailUsuario: req.body.emailUsuario,
-        senhaUsuario: req.body.senhaUsuario,
-        prestador: req.body.adm ? undefined : req.body.prestadorId,
-        enderecoId: req.body.enderecoId,
+        nomeUsuario: req.body.usuario.nomeUsuario,
+        emailUsuario: req.body.usuario.emailUsuario,
+        senhaUsuario: req.body.usuario.senhaUsuario,
+        prestadorId: undefined,
+        enderecoId: endereco.idEndereco,
+        empresaId: empresa.idEmpresa
       },
     });
 
@@ -32,11 +37,16 @@ module.exports = {
     }
   },
   async otp(req, res, next) {
+    var code = gerarOTP(6)
+    prisma.codAuth.create({data:{
+      codigo: code, 
+      email: req.body.usuario.emailUsuario,
+    }})
     var mailOptions = {
-      from: "ishaveemail@gmail.com",
-      to: req.body.emailUsuario,
+      from: "koauys23@gmail.com",
+      to: req.body.usuario.emailUsuario,
       subject: "IshaveApp - Verificação de código",
-      html: `<p>Olá ${req.body.nomeUsuario}! Seu código de vereficação é ${gerarOTP(6)}</p>`,
+      html: `<p>Olá ${req.body.usuario.nomeUsuario}! Seu código de vereficação é ${code}</p>`,
     };
 
     transporter.sendMail(mailOptions, (error, info)=>{

@@ -11,13 +11,14 @@ datasource db {
 model agendamento {
   idAgendamento      Int       @id @default(autoincrement())
   horarioAgendamento DateTime? @db.DateTime(0)
+  createdAt          DateTime @default(now())
   idCliente          Int
   idSvcPtd           Int
   enderecoId         Int
   servicoPrestador servico_prestador @relation(fields: [idSvcPtd], references: [idSvcPtd])
+  endereco endereco @relation(fields: [enderecoId], references: [idEndereco])
   @@index([idCliente])
   @@index([idSvcPtd])
-  endereco endereco @relation(fields: [enderecoId], references: [idEndereco])
   @@index([enderecoId])
 }
 
@@ -56,16 +57,21 @@ model empresa {
   idEmpresa   Int    @id @default(autoincrement())
   cnpjEmpresa String @db.VarChar(25)
   nomeEmpresa String @db.VarChar(255)
-  telEmpresa  String @db.VarChar(11)
+  telEmpresa  String @db.VarChar(20)
+  usuario usuarios[]
+  endereco endereco[]
 }
 
 model endereco {
-  idEndereco      Int     @id @default(autoincrement())
-  cepEndereco     String  @db.VarChar(9)
-  nomeRuaEndereco String  @db.VarChar(150)
-  numEndereco     String  @db.VarChar(10)
-  bairroEndereco  String? @db.VarChar(255)
-  cidadeEndereco  String? @db.VarChar(150)
+  idEndereco Int     @id @default(autoincrement())
+  cep        String  @db.VarChar(9)
+  nomeRua    String  @db.VarChar(150)
+  numero     String  @db.VarChar(10)
+  bairro     String? @db.VarChar(255)
+  cidade     String? @db.VarChar(150)
+  empresaId  Int
+  empresa empresa @relation(fields: [empresaId], references: [idEmpresa])
+  @@index([empresaId])
   usuario usuarios[]
   agendamento agendamento[]
  
@@ -89,11 +95,29 @@ model usuarios {
   emailUsuario String @db.VarChar(255)
   senhaUsuario String @db.VarChar(25)
   prestadorId  Int?
-  enderecoId Int
-  prestador   prestador? @relation(fields: [prestadorId], references: [idPrestador])
-  @@index([prestadorId])
+  enderecoId   Int
+  empresaId    Int
+  prestador    prestador? @relation(fields: [prestadorId], references: [idPrestador])
   endereco     endereco @relation(fields:[enderecoId], references: [idEndereco])
+  empresa      empresa @relation(fields:[empresaId], references: [idEmpresa])
+  @@index([prestadorId])
   @@index([enderecoId])  
+  @@index([empresaId])
+  session session[]
+}
 
-  
+model session {
+  idSession Int @id @default(autoincrement())
+  idUsuario Int
+  usuario usuarios @relation(fields: [idUsuario], references: [idUsuario])
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  @@index([idUsuario])
+}
+
+model codAuth{
+  idCodAuth Int @id @default(autoincrement())
+  codigo    String @db.VarChar(6)
+  email     String @db.VarChar(255)
+  expired   Boolean? @default(false)
 }
