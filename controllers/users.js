@@ -28,18 +28,25 @@ module.exports = {
             next()
           }
     });
-    res.send(gerarURL(dados))
+    res.send('enviamos um email de vonfirmação, verifique.')
   },
   async register(req, res) {
-    const empresa = await prisma.empresa.create({data:req.body.empresa})
-    req.body.endereco.empresaId = empresa.idEmpresa 
-    const endereco = await prisma.endereco.create({data: req.body.endereco});
+
+   dataEncrypted = req.query.d;
+   iv = req.query.v;
+
+   dados = decryiptURL(dataEncrypted, iv);
+   res.json(dados)
+
+    const empresa = await prisma.empresa.create({data:dados.empresa})
+    dados.endereco.empresaId = empresa.idEmpresa 
+    const endereco = await prisma.endereco.create({data: dados.endereco});
   
     const newUser = await prisma.usuarios.create({
       data: {
-        nomeUsuario: req.body.usuario.nomeUsuario,
-        emailUsuario: req.body.usuario.emailUsuario,
-        senhaUsuario: req.body.usuario.senhaUsuario,
+        nomeUsuario: dados.usuario.nomeUsuario,
+        emailUsuario: dados.usuario.emailUsuario,
+        senhaUsuario: dados.usuario.senhaUsuario,
         prestadorId: undefined,
         enderecoId: endereco.idEndereco,
         empresaId: empresa.idEmpresa

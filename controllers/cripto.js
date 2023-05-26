@@ -28,7 +28,7 @@ const gerarURL = (dados) => {
 
   const query = querystring.stringify({d: encryptedData, v: iv.toString("hex"),// gerar string de consulta com dados encripitados
   });
-  const url = `localhost:8081/verifyMail?${query}`; // construir url 
+  const url = `localhost:8081/confirmMail?${query}`; // construir url 
 
   return url;
 };
