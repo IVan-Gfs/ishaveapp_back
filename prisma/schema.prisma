@@ -9,14 +9,15 @@ datasource db {
 }
 
 model agendamento {
-  idAgendamento      Int       @id @default(autoincrement())
-  horarioAgendamento DateTime? @db.DateTime(0)
-  createdAt          DateTime @default(now())
+  idAgendamento      Int               @id @default(autoincrement())
+  horarioAgendamento DateTime?         @db.DateTime(0)
   idCliente          Int
   idSvcPtd           Int
   enderecoId         Int
-  servicoPrestador servico_prestador @relation(fields: [idSvcPtd], references: [idSvcPtd])
-  endereco endereco @relation(fields: [enderecoId], references: [idEndereco])
+  createdAt          DateTime          @default(now())
+  servicoPrestador   servico_prestador @relation(fields: [idSvcPtd], references: [idSvcPtd])
+  endereco           endereco          @relation(fields: [enderecoId], references: [idEndereco])
+
   @@index([idCliente])
   @@index([idSvcPtd])
   @@index([enderecoId])
@@ -32,96 +33,92 @@ model cliente {
 }
 
 model prestador {
-  idPrestador       Int     @id @default(autoincrement())
-  nomePrestador     String  @db.VarChar(150)
-  telPrestador      String  @db.VarChar(20)
-  cpfPrestador      String  @db.VarChar(15)
-  emailPrestador    String  @db.VarChar(255)
-  dataNascPrestador String? @db.VarChar(10)
-  servicos servico_prestador[]
-  usuario usuarios[]
-
-  
+  idPrestador       Int                 @id @default(autoincrement())
+  nomePrestador     String              @db.VarChar(150)
+  telPrestador      String              @db.VarChar(20)
+  cpfPrestador      String              @db.VarChar(15)
+  emailPrestador    String              @db.VarChar(255)
+  dataNascPrestador String?             @db.VarChar(10)
+  servicos          servico_prestador[]
+  usuario           usuarios[]
 }
 
 model servico {
-  idServico        Int     @id @default(autoincrement())
-  nomeServico      String  @db.VarChar(50)
-  precoServico     Decimal   @db.Decimal(6,2)
-  descricaoServico String? @db.VarChar(200)
-  categoriaServico String  @db.VarChar(100)
-  prestadores servico_prestador[]
+  idServico        Int                 @id @default(autoincrement())
+  nomeServico      String              @db.VarChar(50)
+  precoServico     Decimal             @db.Decimal(6, 2)
+  descricaoServico String?             @db.VarChar(200)
+  categoriaServico String              @db.VarChar(100)
+  prestadores      servico_prestador[]
 }
 
 model empresa {
-  idEmpresa   Int    @id @default(autoincrement())
-  cnpjEmpresa String @db.VarChar(25)
-  nomeEmpresa String @db.VarChar(255)
-  telEmpresa  String @db.VarChar(20)
-  usuario usuarios[]
-  endereco endereco[]
+  idEmpresa   Int        @id @default(autoincrement())
+  cnpjEmpresa String     @db.VarChar(25)
+  nomeEmpresa String     @db.VarChar(255)
+  telEmpresa  String     @db.VarChar(20)
+  usuario     usuarios[]
+  endereco    endereco[]
 }
 
 model endereco {
-  idEndereco Int     @id @default(autoincrement())
-  cep        String  @db.VarChar(9)
-  nomeRua    String  @db.VarChar(150)
-  numero     String  @db.VarChar(10)
-  bairro     String? @db.VarChar(255)
-  cidade     String? @db.VarChar(150)
-  empresaId  Int
-  empresa empresa @relation(fields: [empresaId], references: [idEmpresa])
-  @@index([empresaId])
-  usuario usuarios[]
+  idEndereco  Int           @id @default(autoincrement())
+  bairro      String?       @db.VarChar(255)
+  cep         String        @db.VarChar(9)
+  cidade      String?       @db.VarChar(150)
+  empresaId   Int
+  nomeRua     String        @db.VarChar(150)
+  numero      String        @db.VarChar(10)
+  empresa     empresa       @relation(fields: [empresaId], references: [idEmpresa])
+  usuario     usuarios[]
   agendamento agendamento[]
- 
- 
+
+  @@index([empresaId])
 }
 
 model servico_prestador {
-  idSvcPtd    Int     @id @default(autoincrement())
-  servicoId   Int 
-  prestadorId Int 
-  prestador   prestador @relation(fields: [prestadorId], references: [idPrestador])
-  servico     servico   @relation(fields: [servicoId], references: [idServico])
+  idSvcPtd    Int           @id @default(autoincrement())
+  servicoId   Int
+  prestadorId Int
+  prestador   prestador     @relation(fields: [prestadorId], references: [idPrestador])
+  servico     servico       @relation(fields: [servicoId], references: [idServico])
+  agendamento agendamento[]
+
   @@index([servicoId])
   @@index([prestadorId])
-  agendamento agendamento[]
 }
 
 model usuarios {
-  idUsuario    Int @id @default(autoincrement())
-  nomeUsuario  String @db.VarChar(30)
-  emailUsuario String @db.VarChar(255)
-  senhaUsuario String @db.VarChar(25)
+  idUsuario    Int        @id @default(autoincrement())
+  nomeUsuario  String     @db.VarChar(30)
+  emailUsuario String     @db.VarChar(255)
+  senhaUsuario String     @db.VarChar(25)
   prestadorId  Int?
   enderecoId   Int
   empresaId    Int
   prestador    prestador? @relation(fields: [prestadorId], references: [idPrestador])
-  endereco     endereco @relation(fields:[enderecoId], references: [idEndereco])
-  empresa      empresa @relation(fields:[empresaId], references: [idEmpresa])
+  endereco     endereco   @relation(fields: [enderecoId], references: [idEndereco])
+  empresa      empresa    @relation(fields: [empresaId], references: [idEmpresa])
+  session      session[]
+
   @@index([prestadorId])
-  @@index([enderecoId])  
+  @@index([enderecoId])
   @@index([empresaId])
-  session session[]
-  codAuth codAuth[]
 }
 
 model session {
-  idSession Int @id @default(autoincrement())
+  idSession Int      @id @default(autoincrement())
   idUsuario Int
-  usuario usuarios @relation(fields: [idUsuario], references: [idUsuario])
   createdAt DateTime @default(now())
-  updateAt DateTime @updatedAt
+  updateAt  DateTime @updatedAt
+  usuario   usuarios @relation(fields: [idUsuario], references: [idUsuario])
+
   @@index([idUsuario])
 }
 
-model codAuth{
-  idCodAuth Int @id @default(autoincrement())
-  codigo    String @db.VarChar(6)
-  email     String @db.VarChar(255)
-  idUsuario Int
-  usuario usuarios @relation(fields: [idUsuario], references: [idUsuario])
-  @@index([idUsuario])
-  expired   Boolean? @default(false)
+model codAuth {
+  idCodAuth  Int      @id @default(autoincrement())
+  codigo     String   @db.VarChar(6)
+  email      String   @db.VarChar(255)
+  expired_in DateTime
 }

@@ -1,8 +1,35 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const {transporter, gerarOTP} = require("./envmail");
+const {encryptPassword, verifyPassword, gerarURL, decryiptURL} = require('./cripto.js')
+const transporter = require('../config/mailprovider.js')
 
 module.exports = {
+  async sendData(req, res){
+
+    dados = req.body;
+    dados.usuario.nomeUsuario = dados.empresa.nomeEmpresa
+
+    const password = encryptPassword(dados.usuario.senhaUsuario);
+    dados.usuario.senhaUsuario = password;
+    url = gerarURL(dados)
+    var mailOptions = {
+      from: "koauys23@gmail.com",
+      to: req.body.usuario.emailUsuario,
+      subject: "IshaveApp - Confirmação de email",
+      html: `<p>Olá ${req.body.usuario.nomeUsuario}! Seu acesse este link para confirmar seu cadastro em nosso sistema: <br> <a  href="http://${url}">Confirmar</a></p>`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info)=>{
+        if (error) {
+            console.log(error);
+            res.send("<h2>E-mail inválido.<h2>")
+          } else {
+            console.log('Email sent: ' + info.response);
+            next()
+          }
+    });
+    res.send(gerarURL(dados))
+  },
   async register(req, res) {
     const empresa = await prisma.empresa.create({data:req.body.empresa})
     req.body.endereco.empresaId = empresa.idEmpresa 
@@ -38,26 +65,20 @@ module.exports = {
   },
   async otp(req, res, next) {
     var code = gerarOTP(6)
-    prisma.codAuth.create({data:{
-      codigo: code, 
-      email: req.body.usuario.emailUsuario,
-    }})
-    var mailOptions = {
-      from: "koauys23@gmail.com",
-      to: req.body.usuario.emailUsuario,
-      subject: "IshaveApp - Verificação de código",
-      html: `<p>Olá ${req.body.usuario.nomeUsuario}! Seu código de vereficação é ${code}</p>`,
-    };
+    
+      prisma.codAuth.create({data:{
+        codigo: code, 
+        email: req.body.usuario.emailUsuario,
+      }})
+  },
+  async verifyCod(req, res){
+    const cod = await prisma.codAuth.findMany()
+    if(cod[cod.length-1] === req.code){
+      res.send("<h1>Código correto</h1>")
+    }else{
+      res.send("<h1>Código inválido</h1>")
+    }
 
-    transporter.sendMail(mailOptions, (error, info)=>{
-        if (error) {
-            console.log(error);
-            res.send("<h2>E-mail inválido.<h2>")
-          } else {
-            console.log('Email sent: ' + info.response);
-            next()
-          }
-    });
   },
   async logar(req, res) {
     const user = await prisma.usuarios.count({
