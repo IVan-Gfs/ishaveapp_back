@@ -24,11 +24,16 @@ router.post('/agendar', Agendamento.store)
 router.get('/consultar-agendamentos', Agendamento.index)
 
 //login routes 
+
 router.post('/register-user', User.userexists, User.register)
+
+router.post('/sign-up', User.sendData)
+router.get('/confirmMail', User.register)
+router.get('/verify-cod', User.verifyCod);
 router.get('/sign-in', User.logar)
 
 
-router.get('/',(req,res)=>{
+router.get('/',(req, res)=>{
     res.send("<h1>Bem vindo! Deseja agendar ou acessar como cliente nosso?</h1>")
 })
 module.exports = router;
