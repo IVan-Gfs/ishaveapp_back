@@ -24,7 +24,7 @@ router.post('/agendar', Agendamento.store)
 router.get('/consultar-agendamentos', Agendamento.index)
 
 //login routes 
-router.post('/register-user', User.userexists, User.otp, User.register)
+router.post('/register-user', User.userexists, User.register)
 router.get('/sign-in', User.logar)
 
 
