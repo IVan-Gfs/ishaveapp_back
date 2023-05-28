@@ -69,7 +69,6 @@ model endereco {
   bairro      String?       @db.VarChar(255)
   cep         String        @db.VarChar(9)
   cidade      String?       @db.VarChar(150)
-  empresaId   Int
   nomeRua     String        @db.VarChar(150)
   numero      String        @db.VarChar(10)
 

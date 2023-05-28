@@ -12,19 +12,19 @@
     <script>
         function getParams(url){
             const params = new URLSearchParams(url.search)
-            const dados = params.get('d');
+            const encryptedData = params.get('d');
             const iv = params.get('v');
-            return {dados, iv}
+            return {encryptedData, iv}
         }
 
         function sendRequest(){
 
             const endpoint = 'http://localhost:8081/confirmMail';
             const url = new URL(window.location.href)
-            const urlEncoded = url
+           
             const dadosJ = {
-                url: urlEncoded,
-                dados: getParams(url)
+                url: url,
+                dataQuery: getParams(url)
 
             }
             const options = {
@@ -38,7 +38,7 @@
             fetch(endpoint,options).then( res => res.json()).then(data=>{
                 if(data.message){
                    const h1 = document.getElementById('result');
-                   h1.textContent = data.message
+                   h1.innerHTML = data.registered ? data.message+'<a href="loginFicticio.html">login</a>.' : data.message
                 }
             }).catch(error =>{
                 console.log('Ocorreu um erro na requisição: '+error)
