@@ -1,0 +1,16 @@
+body{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: #795420;
+    color: #f3f3f3;
+}
+
+.btnConfirmar{
+    display: inline-block;
+    margin: 5px;
+    background-color: #9e6c2c;
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 2px;
+    font-weight: bold;
+}

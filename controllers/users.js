@@ -2,21 +2,40 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const {encryptPassword, verifyPassword, gerarURL, decryiptURL} = require('./cripto.js')
 const transporter = require('../config/mailprovider.js')
+const fs = require('fs')
 
 module.exports = {
   async sendData(req, res){
 
     dados = req.body;
     dados.usuario.nomeUsuario = dados.empresa.nomeEmpresa
-
     const password = encryptPassword(dados.usuario.senhaUsuario);
     dados.usuario.senhaUsuario = password;
-    url = gerarURL(dados)
+
+    const dataAtual = new Date();
+    const experationTime = 0.25 * 60 * 60 * 1000;
+    const expirationDate = new Date(dataAtual.getTime()+experationTime)
+    const urlRecord = await prisma.urlConfirm.create({
+      data:{
+        url: gerarURL(dados),
+        expires_at: expirationDate.toISOString()
+      }
+    })
+
+    const css = require('./cssMail.js')
     var mailOptions = {
       from: "koauys23@gmail.com",
       to: req.body.usuario.emailUsuario,
       subject: "IshaveApp - Confirmação de email",
-      html: `<p>Olá ${req.body.usuario.nomeUsuario}! Seu acesse este link para confirmar seu cadastro em nosso sistema: <br> <a  href="http://${url}">Confirmar</a></p>`,
+      html: `<html>
+              <head><style>${css}</style></head>
+              <body>
+              <div class="corpo">
+               <p class="info">Para confirmar seu cadastro, acesse o link clicando no botão abaixo:</P>
+               <a class="btnConfirmar" href="http://${urlRecord.url}">Confirmar</a>
+               </div>
+              </body>
+            </html>`,
     };
 
     transporter.sendMail(mailOptions, (error, info)=>{
@@ -28,32 +47,39 @@ module.exports = {
             next()
           }
     });
-    res.send('enviamos um email de vonfirmação, verifique.')
+    res.send('Enviamos um email de confirmação, verifique-o.')
   },
   async register(req, res) {
 
-   dataEncrypted = req.query.d;
-   iv = req.query.v;
+  const urlRecord = await prisma.urlConfirm.findMany({
+    where:{
+      url:{
+        equals: req.body.url.substring('7')
+      }
+    }
+  });
+ 
+   const dataAtual = new Date().getTime();
+   const expiresDate = Date.parse(urlRecord[0].expires_at)
+   dados = JSON.stringify(urlRecord[0])
 
-   dados = decryiptURL(dataEncrypted, iv);
-   res.json(dados)
-
-    const empresa = await prisma.empresa.create({data:dados.empresa})
-    dados.endereco.empresaId = empresa.idEmpresa 
-    const endereco = await prisma.endereco.create({data: dados.endereco});
+   var message = '';
+   if(expiresDate > dataAtual){
+    message = 'Cadastro Confirmado com sucesso, realize o login.'
+    
+    //Antes do cadastro, desencripitar os dados:
+    const todosDados = decryiptURL(req.body.dados.dados, req.body.dados.iv)
+    console.log(todosDados)
+    // Realizar cadastro ---
+    // const endereco = await prisma.endereco.create({data:{}})
+    // const empresa = await prisma.endereco.create({data:{}})
+    // const usuario = await prisma.usuarios.create({data: {}})
   
-    const newUser = await prisma.usuarios.create({
-      data: {
-        nomeUsuario: dados.usuario.nomeUsuario,
-        emailUsuario: dados.usuario.emailUsuario,
-        senhaUsuario: dados.usuario.senhaUsuario,
-        prestadorId: undefined,
-        enderecoId: endereco.idEndereco,
-        empresaId: empresa.idEmpresa
-      },
-    });
-
-    res.json(newUser);
+   
+   }else{
+    message = 'Ops.. Você demorou demais para confirmar seu cadastro. Realize o cadastro novamente.'
+   }
+   res.send({message})
   },
   async userexists(req, res, next) {
     const qtdUserWithData = await prisma.usuarios.count({

@@ -28,7 +28,7 @@ const gerarURL = (dados) => {
 
   const query = querystring.stringify({d: encryptedData, v: iv.toString("hex"),// gerar string de consulta com dados encripitados
   });
-  const url = `localhost:8081/confirmMail?${query}`; // construir url 
+  const url = `127.0.0.1:5500/ishaveapp_back/mail-front-end/confirmCad.html?${query}`; // construir url 
 
   return url;
 };
