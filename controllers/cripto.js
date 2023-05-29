@@ -48,10 +48,3 @@ const decryiptURL = (url, ivHex) => {
 };
 
 module.exports = { encryptPassword, verifyPassword, gerarURL, decryiptURL };
-
-const urlConfirm = gerarURL({
-  nome: "carlos",
-  email: "carlos23@gmail.com",
-  password: "ilovethecaroftheworld",
-});
-
