@@ -7,7 +7,7 @@ const fs = require('fs')
 module.exports = {
   async sendData(req, res) {
 
-    dados = req.body;
+    const dados = req.body;
     dados.usuario.nomeUsuario = dados.empresa.nomeEmpresa
     const password = encryptPassword(dados.usuario.senhaUsuario);
     dados.usuario.senhaUsuario = password;
