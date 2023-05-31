@@ -2,12 +2,15 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const { encryptPassword, verifyPassword, gerarURL, decryiptURL } = require('./cripto.js')
 const transporter = require('../config/mailprovider.js')
-const fs = require('fs')
+const emailValidator = require('email-validator');
+
+
+
 
 module.exports = {
   async sendData(req, res) {
 
-    dados = req.body;
+    const dados = req.body;
     dados.usuario.nomeUsuario = dados.empresa.nomeEmpresa
     const password = encryptPassword(dados.usuario.senhaUsuario);
     dados.usuario.senhaUsuario = password;
@@ -22,6 +25,13 @@ module.exports = {
       }
     })
 
+    // const fs = require('fs')
+    // const path = require('path');
+    // const callback = (err, file)=>{if(err){console.log(err)}  console.log(file)  }
+    // dirSup = path.resolve(__dirname, '..')
+    // const filepath = path.join(dirSup, 'mail-front-end', 'email.css')
+    // fs.readFile(filepath, callback);
+   
     const css = require('./cssMail.js')
     var mailOptions = {
       from: "koauys23@gmail.com",
@@ -38,23 +48,26 @@ module.exports = {
             </html>`,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-        res.send("<h2>E-mail inválido.<h2>")
-      } else {
-        console.log('Email sent: ' + info.response);
-        next()
-      }
-    });
-    res.send('Enviamos um email de confirmação, verifique-o.')
+    if(emailValidator.validate(req.body.usuario.emailUsuario)){
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+          res.json({message:'Não foi possível efetuar o cadastro, verifique se seu e-mail está realmente válido'})
+        }else {
+          console.log('Email sent: ' + info.response);
+          res.json({message:'Enviamos um E-mail para o endereço informado, para confirmar seu cadastro, verifique-o'})
+        }
+      });
+    }else{
+      res.json({message:'Endereço de e-mail inválido'})
+    }    
+    
   },
   async register(req, res) {
     
 
     //Antes do cadastro, desencripitar os dados:
     const todosDados = decryiptURL(req.body.dataQuery.encryptedData, req.body.dataQuery.iv)
-    console.log(todosDados)
     const usuarioExistente = await prisma.usuarios.count({
       where: {
         nomeUsuario: todosDados.usuario.nomeUsuario,
@@ -65,7 +78,7 @@ module.exports = {
     var message = '';
     var registered = true
     if (usuarioExistente > 0) {
-      message = "Usuário já foi cadastro, realize o "
+      message = "Usuário já foi cadastrado, realize o "
     } else {
       //Buscar por url no banco para determinar se está válida.
       const urlRecord = await prisma.urlConfirm.findMany({
@@ -110,10 +123,9 @@ module.exports = {
         nomeUsuario: req.body.usuario.nomeUsuario,
       },
     });
-    console.log(qtdUserWithData);
-
+    
     if (qtdUserWithData > 0) {
-      res.send("<h2>Usuário já existente, faça o login</h2>");
+      res.json({message:'Usuário já existente, faça o login.'});
     } else {
       next();
     }
@@ -138,16 +150,23 @@ module.exports = {
 
   },
   async logar(req, res) {
-    const user = await prisma.usuarios.count({
+    const userdata = await prisma.usuarios.findUnique({
       where: {
         emailUsuario: req.body.emailUsuario,
-        senhaUsuario: req.body.senhaUsuario,
-      },
-    });
-    if (user == 1) {
-      res.send("Conceder acesso");
-    } else {
-      res.send("Senha ou usuário inválidos");
+      }
+    })
+    console.log(userdata)
+    var message;
+    if(userdata){
+      if(verifyPassword(req.body.senhaUsuario, userdata.senhaUsuario)){
+        message = 'Logado'
+      }else{
+        message = 'Senha ou E-mail Inválido'
+      }  
+    }else{
+      message = 'E-mail ou senha inválido'  
     }
+    res.json({message})
+    
   },
 };

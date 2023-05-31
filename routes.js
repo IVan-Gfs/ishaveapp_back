@@ -25,7 +25,7 @@ router.get('/consultar-agendamentos', Agendamento.index)
 
 //login routes 
 
-router.post('/sign-up', User.sendData)
+router.post('/sign-up',User.userexists, User.sendData)
 router.post('/confirmMail', User.register)
 router.get('/verify-cod', User.verifyCod);
 router.get('/sign-in', User.logar)

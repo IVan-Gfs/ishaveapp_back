@@ -11,7 +11,9 @@ const encryptPassword = (password) => {
 };
 
 const verifyPassword =  (pass, hashedPass) => {
-  const [salt, storedPass] = hashedPass.split(':');
+  
+  const [salt, storedPass] = hashedPass.split(':')
+  
 
   //Este é o método usado para geração de um hash, passamos como parâmetro:
   // a senha, o salt, o numéro de iterações realizadas, comprimento do valor dispersado, em bytes, algoritimo de hash
