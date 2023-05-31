@@ -50,19 +50,3 @@ const decryiptURL = (url, ivHex) => {
 };
 
 module.exports = { encryptPassword, verifyPassword, gerarURL, decryiptURL };
-
-const urlConfirm = gerarURL({
-  nome: "carlos",
-  email: "carlos23@gmail.com",
-  password: "ilovethecaroftheworld",
-});
-
-
-
-
-// const queryParametros = querystring.parse(urlConfirm.split("?")[1]);
-// const encryptedData = queryParametros.d;
-// const ivHex = queryParametros.v;
-// console.log("URL de confirmação: " + urlConfirm);
-// const dados = decryiptURL(encryptedData, ivHex);
-// console.log("Dados descripitografados: " + dados.nome);

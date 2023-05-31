@@ -35,7 +35,7 @@ module.exports = {
     const css = require('./cssMail.js')
     var mailOptions = {
       from: "koauys23@gmail.com",
-      to: req.body.usuario.emailUsuario,
+      to: dados.usuario.emailUsuario,
       subject: "IshaveApp - Confirmação de email",
       html: `<html>
               <head><style>${css}</style></head>
