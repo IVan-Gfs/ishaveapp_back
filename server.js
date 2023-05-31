@@ -15,7 +15,11 @@ app.use((req, res, next)=>{
 app.use(session({
     secret: 'dhsdbsh_pqouans_ramdomss', 
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: {
+      secure: false,
+      maxAge: 3600000
+    }
   }));
 app.use(router)
 

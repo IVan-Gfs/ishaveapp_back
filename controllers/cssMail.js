@@ -24,6 +24,9 @@ const css = `
 .btnConfirmar:hover{
     color: #23e152!important;
 }
+.btnConfirmar:visited{
+    color: #23e152!important; 
+}
 `;
 
 module.exports = css

@@ -29,9 +29,15 @@ router.post('/sign-up',User.userexists, User.sendData)
 router.post('/confirmMail', User.register)
 router.get('/verify-cod', User.verifyCod);
 router.get('/sign-in', User.logar)
+router.post('/logout', User.logout)
 
 
-router.get('/',(req, res)=>{
-    res.send("<h1>Bem vindo! Deseja agendar ou acessar como cliente nosso?</h1>")
+router.get('/home',(req, res)=>{
+    
+    if(req.session.sessionId){
+        res.send('<h1>Mantivemos você logado<h1/>')
+    }else{
+        res.send("<h1>Bem vindo! Deseja agendar ou acessar como cliente nosso?</h1>")
+    }
 })
 module.exports = router;

@@ -24,13 +24,6 @@ module.exports = {
         expires_at: expirationDate.toISOString()
       }
     })
-
-    // const fs = require('fs')
-    // const path = require('path');
-    // const callback = (err, file)=>{if(err){console.log(err)}  console.log(file)  }
-    // dirSup = path.resolve(__dirname, '..')
-    // const filepath = path.join(dirSup, 'mail-front-end', 'email.css')
-    // fs.readFile(filepath, callback);
    
     const css = require('./cssMail.js')
     var mailOptions = {
@@ -166,7 +159,18 @@ module.exports = {
     }else{
       message = 'E-mail ou senha inválido'  
     }
+
+    const session = await prisma.session.create({
+      data: {
+        idUsuario: userdata.idUsuario
+      }
+    })
+    req.session.sessionId = session.idSession;
     res.json({message})
     
   },
+  async logout(req,res){
+    delete req.session.sessionId;
+    res.json({message:'Logout efetuado'})
+  }
 };
