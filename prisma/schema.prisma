@@ -11,16 +11,16 @@ datasource db {
 model agendamento {
   idAgendamento      Int               @id @default(autoincrement())
   horarioAgendamento DateTime?         @db.DateTime(0)
-  idCliente          Int
-  idSvcPtd           Int
-  enderecoId         Int
+  idCliente          Int               @unique
+  idSvcPtd           Int               @unique
+  empresaId          Int               @unique
   createdAt          DateTime          @default(now())
   servicoPrestador   servico_prestador @relation(fields: [idSvcPtd], references: [idSvcPtd])
-  endereco           endereco          @relation(fields: [enderecoId], references: [idEndereco])
+  empresa           empresa          @relation(fields: [empresaId], references: [idEmpresa])
 
   @@index([idCliente])
   @@index([idSvcPtd])
-  @@index([enderecoId])
+  @@index([empresaId])
 }
 
 model cliente {
@@ -57,11 +57,12 @@ model empresa {
   cnpjEmpresa String     @db.VarChar(25)
   nomeEmpresa String     @db.VarChar(255)
   telEmpresa  String     @db.VarChar(20)
-  enderecoId  Int
+  enderecoId  Int        @unique  
   endereco    endereco   @relation(fields: [enderecoId], references: [idEndereco])
   usuario     usuarios[]
-
+  agendamento agendamento[]
   @@index([enderecoId])
+  
 }
 
 model endereco {
@@ -71,7 +72,6 @@ model endereco {
   cidade      String?       @db.VarChar(150)
   nomeRua     String        @db.VarChar(150)
   numero      String        @db.VarChar(10)
-  agendamento agendamento[]
   empresa     empresa[]
 }
 

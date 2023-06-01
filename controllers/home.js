@@ -13,6 +13,21 @@ module.exports = {
                 idUsuario: session.idUsuario
             }
         })
+        const empresa = await prisma.empresa.findUnique({
+            where: {
+                idEmpresa: user.empresaId
+            }
+        })
+        const agendamento = await prisma.agendamento.findMany({
+            where:{
+                empresaId: empresa.idEmpresa
+            }
+        })
+        const objTest = {
+            empresa: empresa,
+            agendamentos: agendamento
+        }
+        console.log(objTest)
         res.send(`<h2>Bem-vindo, <u >${user.nomeUsuario}</u>. Nós mantivemos você logado para facilitar sua vida.</h2>`)
     },
     async testSession(req,res, next){
