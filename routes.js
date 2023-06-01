@@ -6,10 +6,12 @@ const Servico = require('./controllers/servico')
 const Prestador = require('./controllers/prestador')
 const Agendamento = require('./controllers/agendamento');
 const User = require('./controllers/users');
+const Home = require('./controllers/home')
 
 //cliente routes
 router.post('/cadastrar-cliente', Cliente.checkClient, Cliente.store)
 router.get('/consultar-clientes', Cliente.index)
+
 
 //servico routes
 router.post('/cadastrar-servico', Servico.store)
@@ -25,19 +27,12 @@ router.get('/consultar-agendamentos', Agendamento.index)
 
 //login routes 
 
-router.post('/sign-up',User.userexists, User.sendData)
+router.post('/sign-up', User.userexists, User.sendData)
 router.post('/confirmMail', User.register)
 router.get('/verify-cod', User.verifyCod);
 router.get('/sign-in', User.logar)
 router.post('/logout', User.logout)
 
 
-router.get('/home',(req, res)=>{
-    
-    if(req.session.sessionId){
-        res.send('<h1>Mantivemos você logado<h1/>')
-    }else{
-        res.send("<h1>Bem vindo! Deseja agendar ou acessar como cliente nosso?</h1>")
-    }
-})
+router.get('/home',Home.testSession, Home.getUser )
 module.exports = router;

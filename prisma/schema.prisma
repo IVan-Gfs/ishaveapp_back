@@ -89,8 +89,8 @@ model servico_prestador {
 
 model usuarios {
   idUsuario    Int        @id @default(autoincrement())
-  nomeUsuario  String     @db.VarChar(30)
-  emailUsuario String     @unique @db.VarChar(255) 
+  nomeUsuario  String     @unique @db.VarChar(30)
+  emailUsuario String     @unique @db.VarChar(255)
   senhaUsuario String     @db.VarChar(255)
   prestadorId  Int?
   empresaId    Int

@@ -112,11 +112,10 @@ module.exports = {
   async userexists(req, res, next) {
     const qtdUserWithData = await prisma.usuarios.count({
       where: {
-        emailUsuario: req.body.usuario.emailUsuario,
-        nomeUsuario: req.body.usuario.nomeUsuario,
+        emailUsuario: req.body.usuario.emailUsuario
       },
     });
-    
+    console.log(qtdUserWithData)
     if (qtdUserWithData > 0) {
       res.json({message:'Usuário já existente, faça o login.'});
     } else {
@@ -143,30 +142,32 @@ module.exports = {
 
   },
   async logar(req, res) {
+    const {emailUsuario: email, senhaUsuario: senha} = req.body
+  
     const userdata = await prisma.usuarios.findUnique({
       where: {
-        emailUsuario: req.body.emailUsuario,
+        emailUsuario: email
+        
       }
     })
-    console.log(userdata)
     var message;
     if(userdata){
-      if(verifyPassword(req.body.senhaUsuario, userdata.senhaUsuario)){
+      if(verifyPassword(senha, userdata.senhaUsuario)){
         message = 'Logado'
+        const session = await prisma.session.create({
+          data: {
+            idUsuario: userdata.idUsuario
+          }
+        })
+        req.session.sessionId = session.idSession;
+       
       }else{
         message = 'Senha ou E-mail Inválido'
       }  
     }else{
       message = 'E-mail ou senha inválido'  
     }
-
-    const session = await prisma.session.create({
-      data: {
-        idUsuario: userdata.idUsuario
-      }
-    })
-    req.session.sessionId = session.idSession;
-    res.json({message})
+    res.json({message}) 
     
   },
   async logout(req,res){
