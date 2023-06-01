@@ -12,7 +12,7 @@ model agendamento {
   idAgendamento      Int               @id @default(autoincrement())
   horarioAgendamento DateTime?         @db.DateTime(0)
   idCliente          Int               @unique
-  idSvcPtd           Int               @unique
+  idSvcPtd           Int               @unique    
   empresaId          Int               @unique
   createdAt          DateTime          @default(now())
   servicoPrestador   servico_prestador @relation(fields: [idSvcPtd], references: [idSvcPtd])
@@ -26,10 +26,10 @@ model agendamento {
 model cliente {
   idCliente       Int     @id @default(autoincrement())
   nomeCliente     String  @db.VarChar(150)
-  telCliente      String? @db.VarChar(11)
+  telCliente      String @db.VarChar(20)
   cpfCliente      String? @db.VarChar(15)
   emailCliente    String? @db.VarChar(255)
-  dataNascCliente String  @db.VarChar(10)
+  dataNascCliente String?  @db.VarChar(10)
 }
 
 model prestador {

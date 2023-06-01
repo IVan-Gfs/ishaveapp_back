@@ -12,15 +12,18 @@ module.exports = {
         dataNascPrestador: req.body.dataNascPrestador       
       },
     });
-
-    await prisma.servico_prestador.create({
-      data: {
-        prestadorId: prestador.idPrestador,
-        servicoId:  req.body.idServico
-      },
+    req.body.idServices.forEach(idServico => {
+       prisma.servico_prestador.create({
+        data: {
+          prestadorId: prestador.idPrestador,
+          servicoId: idServico
+        },
+      });
     });
+    
+    
 
-    res.json(prestador);
+    res.json({message:"Prestador cadastrado com sucesso"});
   },
   async index(req, res) {
     const prestadores = await prisma.prestador.findMany();
