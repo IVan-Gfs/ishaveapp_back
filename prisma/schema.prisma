@@ -69,9 +69,11 @@ model endereco {
   idEndereco  Int           @id @default(autoincrement())
   bairro      String?       @db.VarChar(255)
   cep         String        @db.VarChar(9)
+  uf          String        @db.VarChar(2)
   cidade      String?       @db.VarChar(150)
-  nomeRua     String        @db.VarChar(150)
+  logradouro  String        @db.VarChar(150)
   numero      String        @db.VarChar(10)
+
   empresa     empresa[]
 }
 

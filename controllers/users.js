@@ -25,7 +25,7 @@ module.exports = {
       }
     })
    
-    const css = require('./cssMail.js')
+    const css = require('../config/cssMail.js')
     var mailOptions = {
       from: "koauys23@gmail.com",
       to: dados.usuario.emailUsuario,
