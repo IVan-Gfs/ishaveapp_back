@@ -30,8 +30,8 @@ router.get('/consultar-agendamentos', Agendamento.index)
 router.post('/sign-up', User.userexists, User.sendData)
 router.post('/confirmMail', User.register)
 router.get('/verify-cod', User.verifyCod);
-router.get('/sign-in', User.logar)
-router.post('/logout', User.logout)
+router.post('/sign-in', User.logar)
+router.delete('/logout', User.logout)
 
 
 router.get('/home',Home.testSession, Home.getUser )

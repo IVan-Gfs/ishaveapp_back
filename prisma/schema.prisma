@@ -53,7 +53,7 @@ model servico {
 }
 
 model empresa {
-  idEmpresa   Int        @id @default(autoincrement())
+  idEmpresa   Int        @id @default(autoincrement()) @unique  
   cnpjEmpresa String     @db.VarChar(25)
   nomeEmpresa String     @db.VarChar(255)
   telEmpresa  String     @db.VarChar(20)
@@ -67,12 +67,12 @@ model empresa {
 
 model endereco {
   idEndereco  Int           @id @default(autoincrement())
-  bairro      String?       @db.VarChar(255)
-  cep         String        @db.VarChar(9)
-  uf          String        @db.VarChar(2)
-  cidade      String?       @db.VarChar(150)
-  logradouro  String        @db.VarChar(150)
-  numero      String        @db.VarChar(10)
+  bairro          String?       @db.VarChar(255)
+  cep             String        @db.VarChar(9)
+  uf              String        @db.VarChar(2)
+  cidade          String?       @db.VarChar(150)
+  logradouro      String        @db.VarChar(150)
+  numEmpresa      String        @db.VarChar(10)
 
   empresa     empresa[]
 }
@@ -95,7 +95,7 @@ model usuarios {
   emailUsuario String     @unique @db.VarChar(255)
   senhaUsuario String     @db.VarChar(255)
   prestadorId  Int?
-  empresaId    Int
+  empresaId    Int        @unique
   prestador    prestador? @relation(fields: [prestadorId], references: [idPrestador])
   empresa      empresa    @relation(fields: [empresaId], references: [idEmpresa])
   session      session[]
