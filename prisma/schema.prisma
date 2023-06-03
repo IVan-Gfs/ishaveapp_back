@@ -10,7 +10,7 @@ datasource db {
 
 model agendamento {
   idAgendamento      Int               @id @default(autoincrement())
-  horarioAgendamento DateTime?         @db.DateTime(0)
+  horarioAgendamento DateTime        
   idCliente          Int               @unique
   idSvcPtd           Int               @unique    
   empresaId          Int               @unique
