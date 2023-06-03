@@ -11,16 +11,19 @@ datasource db {
 model agendamento {
   idAgendamento      Int               @id @default(autoincrement())
   horarioAgendamento DateTime        
-  idCliente          Int               @unique
-  idSvcPtd           Int               @unique    
-  empresaId          Int               @unique
+  clienteId          Int               
+  prestadorId        Int                 
+  empresaId          Int               
   createdAt          DateTime          @default(now())
-  servicoPrestador   servico_prestador @relation(fields: [idSvcPtd], references: [idSvcPtd])
-  empresa           empresa          @relation(fields: [empresaId], references: [idEmpresa])
+  cliente            cliente   @relation(fields: [clienteId], references: [idCliente])
+  prestador          prestador @relation(fields: [prestadorId], references: [idPrestador])
+  empresa            empresa   @relation(fields: [empresaId], references: [idEmpresa])
 
-  @@index([idCliente])
-  @@index([idSvcPtd])
+  @@index([clienteId])
+  @@index([prestadorId])
   @@index([empresaId])
+
+  AgSvc agendamento_servicos[]
 }
 
 model cliente {
@@ -30,6 +33,7 @@ model cliente {
   cpfCliente      String? @db.VarChar(15)
   emailCliente    String? @db.VarChar(255)
   dataNascCliente String?  @db.VarChar(10)
+  agendamento agendamento[]
 }
 
 model prestador {
@@ -40,6 +44,7 @@ model prestador {
   emailPrestador    String              @db.VarChar(255)
   dataNascPrestador String?             @db.VarChar(10)
   servicos          servico_prestador[]
+  agendamento       agendamento[]
   usuario           usuarios[]
 }
 
@@ -50,10 +55,11 @@ model servico {
   descricaoServico String?             @db.VarChar(200)
   categoriaServico String              @db.VarChar(100)
   prestadores      servico_prestador[]
+  AgSvc agendamento_servicos[]
 }
 
 model empresa {
-  idEmpresa   Int        @id @default(autoincrement()) @unique  
+  idEmpresa   Int        @id @default(autoincrement())  
   cnpjEmpresa String     @db.VarChar(25)
   nomeEmpresa String     @db.VarChar(255)
   telEmpresa  String     @db.VarChar(20)
@@ -76,15 +82,22 @@ model endereco {
 
   empresa     empresa[]
 }
+model agendamento_servicos{
+  idAgSvc       Int           @id @default(autoincrement())
+  agendamentoId Int
+  servicoId Int
+  agendamento agendamento @relation(fields: [agendamentoId], references: [idAgendamento])
+  servico     servico     @relation(fields: [servicoId], references: [idServico])
+  @@index([agendamentoId])
+  @@index([servicoId])    
 
+}
 model servico_prestador {
   idSvcPtd    Int           @id @default(autoincrement())
   servicoId   Int
   prestadorId Int
   prestador   prestador     @relation(fields: [prestadorId], references: [idPrestador])
   servico     servico       @relation(fields: [servicoId], references: [idServico])
-  agendamento agendamento[]
-
   @@index([servicoId])
   @@index([prestadorId])
 }
@@ -106,12 +119,12 @@ model usuarios {
 
 model session {
   idSession Int      @id @default(autoincrement())
-  idUsuario Int
+  usuarioId Int
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
-  usuario   usuarios @relation(fields: [idUsuario], references: [idUsuario])
+  usuario   usuarios @relation(fields: [usuarioId], references: [idUsuario])
 
-  @@index([idUsuario])
+  @@index([usuarioId])
 }
 
 model urlConfirm {

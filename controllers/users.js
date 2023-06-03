@@ -156,7 +156,7 @@ module.exports = {
         message = 'Logado'
         const session = await prisma.session.create({
           data: {
-            idUsuario: userdata.idUsuario
+           usuarioId: userdata.idUsuario
           }
         })
         req.session.sessionId = session.idSession;
