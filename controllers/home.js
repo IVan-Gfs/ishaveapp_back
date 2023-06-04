@@ -1,31 +1,89 @@
 const { PrismaClient } = require("@prisma/client");
+const agendamento = require("./agendamento");
 const prisma = new PrismaClient();
 
 module.exports = {
-    async getUser(req, res) {
-        //Obter dados do usuário ao logar
+    //NOTA: existe a posibilidade de migrar esse código para o controller de agendamento.
+    //Mas por enquanto, vamos deixar aqui.
+    async getDataHome(req, res) {
+        //Obter dados do usuario ao lugar
         const usuario = await prisma.usuarios.findFirst({
             where: {
                 session: {
-                    some:{
-                        idSession:{
+                    some: {
+                        idSession: {
                             equals: req.session.sessionId
                         }
                     }
                 }
             },
-            include:{empresa:true}
-        })
-        //buscar os agendamento que pertencem a empresa do usuário
-        const agendamento = await prisma.agendamento.findMany({
-            where:{
-                empresaId: usuario.empresa.idEmpresa
+            select: {
+                nomeUsuario: true,
+                empresa: true
             }
         })
+        //Buscar os agendamentos que pertencem a empresa do usuário
+        const dadosAgends = await prisma.agendamento.findMany({
+            where: {
+                empresaId: usuario.empresa.idEmpresa
+            },
+            include: {
+                cliente: true,
+                prestador: {
+                    include: {
+                        usuario: {
+                            where: {
+                                empresaId: usuario.empresa.idEmpresa
+                            }
+                        }
+                    }
+                }
+
+            }
+        })
+
         
-        //test srsr
-        console.log({usuario, agendamento})
-        res.send(`<h2>Bem-vindo, <u >${usuario.nomeUsuario}</u>. Nós mantivemos você logado para facilitar sua vida.</h2>`)
+        //Estruturar array de agendamentos que será enviado como resposta 
+        const agendamentos = []
+        for (const agendamento of dadosAgends) {
+            const dataHora = new Date(agendamento.horarioAgendamento);
+            const dia = dataHora.getDate()
+            const mês = dataHora.getMonth()
+            const ano = dataHora.getFullYear()
+            const data = dia + "/" + mês + "/" + ano
+            const horario = dataHora.getHours() + ":" + dataHora.getMinutes()
+        
+            const servicos = await prisma.agendamento_servicos.findMany({
+                where: {
+                    agendamentoId: agendamento.idAgendamento
+                },
+                include: {
+                    servico: {
+                        select: {
+                            nomeServico: true,
+                            precoServico: true
+                          }
+                    }
+                }
+            })     
+            const objAg = {
+                nome: agendamento.cliente.nomeCliente,
+                data: data,
+                horario: horario,
+                servicos: [],
+                profissional: agendamento.prestador.nomePrestador
+            }
+            
+            for (let i = 0; i < servicos.length; i++){
+                const preco = parseFloat(servicos[i].servico.precoServico) 
+                objAg.servicos.push(servicos[i].servico)
+                objAg.servicos[i].precoServico = preco.toFixed(2)
+            }
+            agendamentos.push(objAg)
+        }
+        //Enviar os dados para a home
+        res.status(200).json({usuario, agendamentos})
+
     },
     async testSession(req, res, next) {
         if (req.session.sessionId) {

@@ -34,5 +34,5 @@ router.post('/sign-in', User.logar)
 router.delete('/logout', User.logout)
 
 
-router.get('/home',Home.testSession, Home.getUser )
+router.get('/home',Home.testSession, Home.getDataHome )
 module.exports = router;
