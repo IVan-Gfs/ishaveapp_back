@@ -24,15 +24,16 @@ router.get('/consultar-prestadores', Prestador.index)
 //agendamento routes 
 router.post('/agendar', Agendamento.store)
 router.get('/consultar-agendamentos', Agendamento.index)
+router.get('/filtrar-data', Agendamento.filtrarData)
+
 
 //login routes 
-
 router.post('/sign-up', User.userexists, User.sendData)
 router.post('/confirmMail', User.register)
 router.get('/verify-cod', User.verifyCod);
 router.post('/sign-in', User.logar)
 router.delete('/logout', User.logout)
-
-
 router.get('/home',Home.testSession, Home.getDataHome )
+
+
 module.exports = router;

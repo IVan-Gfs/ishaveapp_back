@@ -9,7 +9,7 @@ const emailValidator = require('email-validator');
 
 module.exports = {
   async sendData(req, res) {
-
+    console.log('acessou a rota')
     const dados = req.body;
     dados.usuario.nomeUsuario = dados.empresa.nomeEmpresa
     const password = encryptPassword(dados.usuario.senhaUsuario);

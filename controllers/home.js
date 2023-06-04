@@ -61,11 +61,13 @@ module.exports = {
                     servico: {
                         select: {
                             nomeServico: true,
-                            precoServico: true
+                            precoServico: true,
+                            descricaoServico: true
                           }
                     }
                 }
-            })     
+            })
+              
             const objAg = {
                 nome: agendamento.cliente.nomeCliente,
                 data: data,
@@ -76,8 +78,13 @@ module.exports = {
             
             for (let i = 0; i < servicos.length; i++){
                 const preco = parseFloat(servicos[i].servico.precoServico) 
-                objAg.servicos.push(servicos[i].servico)
-                objAg.servicos[i].precoServico = preco.toFixed(2)
+                const servico = {
+                    nome: servicos[i].servico.nomeServico,
+                    preco: preco.toFixed(2),
+                    descricao: servicos[i].servico.descricaoServico,
+                }
+                
+                objAg.servicos.push(servico)
             }
             agendamentos.push(objAg)
         }
