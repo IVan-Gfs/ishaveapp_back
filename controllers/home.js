@@ -22,16 +22,31 @@ module.exports = {
                 empresa: true
             }
         })
-        
-        //A data de hoje será usada como condição para filtrar agendamentos do dia
-        const dataHora = new Date()   
-        const dataDehoje = `${dataHora.getDate()}-${dataHora.getMonth()}-${dataHora.getFullYear()}`
 
-        //Buscar os agendamentos que pertencem a empresa do usuário
+        
+
+        //Buscar os agendamentos que pertencem a empresa do usuário (duas formas)
+        
+        //Buscar somente os agendamentos para o dia atual 
+
+        //A data de hoje será usada como condição para filtrar agendamentos do dia
+        const dataHora = new Date()
+        const dataDehoje = `${dataHora.getFullYear()}-${dataHora.getMonth()}-${dataHora.getDate()}`
+
+        const id = usuario.empresa.idEmpresa
+        agendamentosBD = await prisma.$queryRaw`
+        SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
+        FROM agendamento, cliente, prestador, servico
+        WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${id} 
+        AND agendamento.clienteId=cliente.idCliente
+        AND agendamento.prestadorId=prestador.idPrestador
+        ORDER BY horarioAgendamento DESC`
+        console.log(agendamentosBD)
+
+        //Buscar todos os agendamentos
         const dadosAgends = await prisma.agendamento.findMany({
             where: {
                 empresaId: usuario.empresa.idEmpresa,
-              
             },
             include: {
                 cliente: true,
@@ -48,7 +63,7 @@ module.exports = {
             }
         })
 
-        
+
         //Estruturar array de agendamentos que será enviado como resposta 
         const agendamentos = []
         for (const agendamento of dadosAgends) {
@@ -58,7 +73,7 @@ module.exports = {
             const ano = dataHora.getFullYear()
             const data = dia + "/" + mês + "/" + ano
             const horario = dataHora.getHours() + ":" + dataHora.getMinutes()
-        
+
             const servicos = await prisma.agendamento_servicos.findMany({
                 where: {
                     agendamentoId: agendamento.idAgendamento
@@ -69,11 +84,11 @@ module.exports = {
                             nomeServico: true,
                             precoServico: true,
                             descricaoServico: true
-                          }
+                        }
                     }
                 }
             })
-              
+
             const objAg = {
                 nome: agendamento.cliente.nomeCliente,
                 data: data,
@@ -81,21 +96,21 @@ module.exports = {
                 servicos: [],
                 profissional: agendamento.prestador.nomePrestador
             }
-            
-            for (let i = 0; i < servicos.length; i++){
-                const preco = parseFloat(servicos[i].servico.precoServico) 
+
+            for (let i = 0; i < servicos.length; i++) {
+                const preco = parseFloat(servicos[i].servico.precoServico)
                 const servico = {
                     nome: servicos[i].servico.nomeServico,
                     preco: preco.toFixed(2),
                     descricao: servicos[i].servico.descricaoServico,
                 }
-                
+
                 objAg.servicos.push(servico)
             }
             agendamentos.push(objAg)
         }
         //Enviar os dados para a home
-        res.status(200).json({usuario, agendamentos})
+        res.status(200).json({ usuario, agendamentos })
 
     },
     async testSession(req, res, next) {
