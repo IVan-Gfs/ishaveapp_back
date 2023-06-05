@@ -35,5 +35,9 @@ router.post('/sign-in', User.logar)
 router.delete('/logout', User.logout)
 router.get('/home',Home.testSession, Home.getDataHome )
 
+//Tetse
+router.get('/',(req,res)=>{
+    res.send('<h1>BATEU NA ROTA!</h1>')
+})
 
 module.exports = router;

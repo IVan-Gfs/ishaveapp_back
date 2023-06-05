@@ -9,31 +9,30 @@ datasource db {
 }
 
 model agendamento {
-  idAgendamento      Int               @id @default(autoincrement())
-  horarioAgendamento DateTime        
-  clienteId          Int               
-  prestadorId        Int                 
-  empresaId          Int               
-  createdAt          DateTime          @default(now())
-  cliente            cliente   @relation(fields: [clienteId], references: [idCliente])
-  prestador          prestador @relation(fields: [prestadorId], references: [idPrestador])
-  empresa            empresa   @relation(fields: [empresaId], references: [idEmpresa])
+  idAgendamento      Int                    @id @default(autoincrement())
+  horarioAgendamento DateTime
+  clienteId          Int
+  prestadorId        Int
+  empresaId          Int
+  createdAt          DateTime               @default(now())
+  cliente            cliente                @relation(fields: [clienteId], references: [idCliente])
+  prestador          prestador              @relation(fields: [prestadorId], references: [idPrestador])
+  empresa            empresa                @relation(fields: [empresaId], references: [idEmpresa])
+  AgSvc              agendamento_servicos[]
 
   @@index([clienteId])
   @@index([prestadorId])
   @@index([empresaId])
-
-  AgSvc agendamento_servicos[]
 }
 
 model cliente {
-  idCliente       Int     @id @default(autoincrement())
-  nomeCliente     String  @db.VarChar(150)
-  telCliente      String @db.VarChar(20)
-  cpfCliente      String? @db.VarChar(15)
-  emailCliente    String? @db.VarChar(255)
-  dataNascCliente String?  @db.VarChar(10)
-  agendamento agendamento[]
+  idCliente       Int           @id @default(autoincrement())
+  nomeCliente     String        @db.VarChar(150)
+  telCliente      String        @db.VarChar(20)
+  cpfCliente      String?       @db.VarChar(15)
+  emailCliente    String?       @db.VarChar(255)
+  dataNascCliente String?       @db.VarChar(10)
+  agendamento     agendamento[]
 }
 
 model prestador {
@@ -48,55 +47,57 @@ model prestador {
 }
 
 model servico {
-  idServico        Int                 @id @default(autoincrement())
-  nomeServico      String              @db.VarChar(50)
-  precoServico     Decimal             @db.Decimal(6, 2)
-  descricaoServico String?             @db.VarChar(200)
-  categoriaServico String              @db.VarChar(100)
+  idServico        Int                    @id @default(autoincrement())
+  nomeServico      String                 @db.VarChar(50)
+  precoServico     Decimal                @db.Decimal(6, 2)
+  descricaoServico String?                @db.VarChar(200)
+  categoriaServico String                 @db.VarChar(100)
   prestadores      servico_prestador[]
-  AgSvc agendamento_servicos[]
+  AgSvc            agendamento_servicos[]
 }
 
 model empresa {
-  idEmpresa   Int        @id @default(autoincrement())  
-  cnpjEmpresa String     @db.VarChar(25)
-  nomeEmpresa String     @db.VarChar(255)
-  telEmpresa  String     @db.VarChar(20)
-  enderecoId  Int        @unique  
-  endereco    endereco   @relation(fields: [enderecoId], references: [idEndereco])
+  idEmpresa   Int           @id @default(autoincrement())
+  cnpjEmpresa String        @db.VarChar(25)
+  nomeEmpresa String        @db.VarChar(255)
+  telEmpresa  String        @db.VarChar(20)
+  enderecoId  Int           @unique
+  endereco    endereco      @relation(fields: [enderecoId], references: [idEndereco])
   usuario     usuarios[]
   agendamento agendamento[]
+
   @@index([enderecoId])
-  
 }
 
 model endereco {
-  idEndereco  Int           @id @default(autoincrement())
-  bairro          String?       @db.VarChar(255)
-  cep             String        @db.VarChar(9)
-  uf              String        @db.VarChar(2)
-  cidade          String?       @db.VarChar(150)
-  logradouro      String        @db.VarChar(150)
-  numEmpresa      String        @db.VarChar(10)
-
-  empresa     empresa[]
+  idEndereco Int       @id @default(autoincrement())
+  bairro     String?   @db.VarChar(255)
+  cep        String    @db.VarChar(9)
+  uf         String    @db.VarChar(2)
+  cidade     String?   @db.VarChar(150)
+  logradouro String    @db.VarChar(150)
+  numEmpresa String    @db.VarChar(10)
+  empresa    empresa[]
 }
-model agendamento_servicos{
-  idAgSvc       Int           @id @default(autoincrement())
+
+model agendamento_servicos {
+  idAgSvc       Int         @id @default(autoincrement())
   agendamentoId Int
-  servicoId Int
-  agendamento agendamento @relation(fields: [agendamentoId], references: [idAgendamento])
-  servico     servico     @relation(fields: [servicoId], references: [idServico])
-  @@index([agendamentoId])
-  @@index([servicoId])    
+  servicoId     Int
+  agendamento   agendamento @relation(fields: [agendamentoId], references: [idAgendamento])
+  servico       servico     @relation(fields: [servicoId], references: [idServico])
 
+  @@index([agendamentoId])
+  @@index([servicoId])
 }
+
 model servico_prestador {
-  idSvcPtd    Int           @id @default(autoincrement())
+  idSvcPtd    Int       @id @default(autoincrement())
   servicoId   Int
   prestadorId Int
-  prestador   prestador     @relation(fields: [prestadorId], references: [idPrestador])
-  servico     servico       @relation(fields: [servicoId], references: [idServico])
+  prestador   prestador @relation(fields: [prestadorId], references: [idPrestador])
+  servico     servico   @relation(fields: [servicoId], references: [idServico])
+
   @@index([servicoId])
   @@index([prestadorId])
 }
@@ -107,7 +108,7 @@ model usuarios {
   emailUsuario String     @unique @db.VarChar(255)
   senhaUsuario String     @db.VarChar(255)
   prestadorId  Int?
-  empresaId    Int        
+  empresaId    Int
   prestador    prestador? @relation(fields: [prestadorId], references: [idPrestador])
   empresa      empresa    @relation(fields: [empresaId], references: [idEmpresa])
   session      session[]
@@ -118,9 +119,9 @@ model usuarios {
 
 model session {
   idSession Int      @id @default(autoincrement())
-  usuarioId Int
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
+  usuarioId Int
   usuario   usuarios @relation(fields: [usuarioId], references: [idUsuario])
 
   @@index([usuarioId])
