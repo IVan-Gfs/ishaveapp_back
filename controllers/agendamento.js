@@ -116,7 +116,7 @@ module.exports = {
             const data = `${dia}/${mês}/${ano}`
             const horario = `${dataHora.getHours()}:${dataHora.getMinutes()}`
 
-            const objAg = {
+            const objAg = {//estrutura de objeto que representa cada agendamento
                 nome: agendamento.nomeCliente,
                 data: data,
                 horario: horario,

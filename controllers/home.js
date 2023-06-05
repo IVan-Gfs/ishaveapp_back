@@ -22,10 +22,16 @@ module.exports = {
                 empresa: true
             }
         })
+        
+        //A data de hoje será usada como condição para filtrar agendamentos do dia
+        const dataHora = new Date()   
+        const dataDehoje = `${dataHora.getDate()}-${dataHora.getMonth()}-${dataHora.getFullYear()}`
+
         //Buscar os agendamentos que pertencem a empresa do usuário
         const dadosAgends = await prisma.agendamento.findMany({
             where: {
-                empresaId: usuario.empresa.idEmpresa
+                empresaId: usuario.empresa.idEmpresa,
+              
             },
             include: {
                 cliente: true,
