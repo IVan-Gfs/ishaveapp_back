@@ -151,6 +151,7 @@ module.exports = {
       }
     })
     var message;
+    var idSession;
     if(userdata){
       if(verifyPassword(senha, userdata.senhaUsuario)){
         message = 'Logado'
@@ -160,6 +161,7 @@ module.exports = {
           }
         })
         req.session.sessionId = session.idSession;
+        idSession = session.idSession;
        
       }else{
         message = 'Senha ou E-mail Inválido'
@@ -167,7 +169,7 @@ module.exports = {
     }else{
       message = 'E-mail ou senha inválido'  
     }
-    res.json({message}) 
+    res.json({message,idSession}) 
     
   },
   async logout(req,res){
