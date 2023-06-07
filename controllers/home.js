@@ -22,10 +22,7 @@ module.exports = {
                 empresa: true
             }
         })
-
-        
-        
-        
+  
         //A data de hoje será usada como condição para filtrar agendamentos do dia
         const dataHora = new Date().toLocaleDateString()
         const dataDehoje = dataHora.split('/').reverse().join('-')
