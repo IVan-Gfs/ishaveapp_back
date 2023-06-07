@@ -24,55 +24,29 @@ module.exports = {
         })
 
         
-
-        //Buscar os agendamentos que pertencem a empresa do usuário (duas formas)
         
-        //Buscar somente os agendamentos para o dia atual 
-
+        
         //A data de hoje será usada como condição para filtrar agendamentos do dia
-        const dataHora = new Date()
-        const dataDehoje = `${dataHora.getFullYear()}-${dataHora.getMonth()}-${dataHora.getDate()}`
+        const dataHora = new Date().toLocaleDateString()
+        const dataDehoje = dataHora.split('/').reverse().join('-')
 
+        //Buscar somente os agendamentos para o dia atual 
         const id = usuario.empresa.idEmpresa
-        agendamentosBD = await prisma.$queryRaw`
+        const agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
         FROM agendamento, cliente, prestador, servico
         WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${id} 
         AND agendamento.clienteId=cliente.idCliente
         AND agendamento.prestadorId=prestador.idPrestador
-        ORDER BY horarioAgendamento DESC`
-        console.log(agendamentosBD)
-
-        //Buscar todos os agendamentos
-        const dadosAgends = await prisma.agendamento.findMany({
-            where: {
-                empresaId: usuario.empresa.idEmpresa,
-            },
-            include: {
-                cliente: true,
-                prestador: {
-                    include: {
-                        usuario: {
-                            where: {
-                                empresaId: usuario.empresa.idEmpresa
-                            }
-                        }
-                    }
-                }
-
-            }
-        })
-
+        ORDER BY horarioAgendamento DESC`   
 
         //Estruturar array de agendamentos que será enviado como resposta 
         const agendamentos = []
-        for (const agendamento of dadosAgends) {
-            const dataHora = new Date(agendamento.horarioAgendamento);
-            const dia = dataHora.getDate()
-            const mês = dataHora.getMonth()
-            const ano = dataHora.getFullYear()
-            const data = dia + "/" + mês + "/" + ano
-            const horario = dataHora.getHours() + ":" + dataHora.getMinutes()
+        for (const agendamento of agendamentosBD) {
+
+            const dataHora = agendamento.horarioAgendamento
+            const data = new Date(dataHora).toLocaleDateString();
+            const horario = new Date(dataHora).toISOString().substring(11,16)     
 
             const servicos = await prisma.agendamento_servicos.findMany({
                 where: {
@@ -90,11 +64,11 @@ module.exports = {
             })
 
             const objAg = {
-                nome: agendamento.cliente.nomeCliente,
+                nome: agendamento.nomeCliente,
                 data: data,
                 horario: horario,
                 servicos: [],
-                profissional: agendamento.prestador.nomePrestador
+                profissional: agendamento.nomePrestador
             }
 
             for (let i = 0; i < servicos.length; i++) {

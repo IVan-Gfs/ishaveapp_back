@@ -35,5 +35,10 @@ router.post('/sign-in', User.logar)
 router.delete('/logout', User.logout)
 router.get('/home',Home.testSession, Home.getDataHome )
 
+// testUpload
+const upload = require('./controllers/multer')
+const ctrlUp = require('./controllers/picture')
+router.post('/upload', upload.single('file'), ctrlUp.ctrlUp )
+
 
 module.exports = router;

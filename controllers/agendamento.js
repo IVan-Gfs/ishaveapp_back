@@ -109,12 +109,11 @@ module.exports = {
         //Estruturar array de agendamentos filtrados
         const agendamentos = []
         for (agendamento of agendamentosBD) {
-            const dataHora = new Date(agendamento.horarioAgendamento)
-            const dia = dataHora.getDate()
-            const mês = dataHora.getMonth()
-            const ano = dataHora.getFullYear()
-            const data = `${dia}/${mês}/${ano}`
-            const horario = `${dataHora.getHours()}:${dataHora.getMinutes()}`
+
+            const dataHora = agendamento.horarioAgendamento
+            
+            const data = new Date(dataHora).toLocaleDateString();
+            const horario = new Date(dataHora).toDateString().substring(11,16)
 
             const objAg = {//estrutura de objeto que representa cada agendamento
                 nome: agendamento.nomeCliente,
