@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
+const getID = require('./resource/pegarId')
 
 module.exports = {
     async store(req, res){      
@@ -8,7 +9,13 @@ module.exports = {
          res.json(cliente)           
     },
     async index(req, res){
-        const clientes = await prisma.cliente.findMany()
+        //Busca por todos os clientes que foram agendados alguma vez
+        const id = await getID.empresa(req.session.sessionId)
+        const clientes = await prisma.$queryRaw`
+        SELECT DISTINCT cliente.* FROM cliente, agendamento
+        WHERE cliente.idCliente=agendamento.clienteId
+        AND agendamento.empresaId=${id}
+        `
         res.json(clientes)
 
     },
