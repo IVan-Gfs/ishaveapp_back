@@ -1,27 +1,11 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient;
-
+const getID = require('./resource/pegarId.js')
 module.exports = {
     async store(req, res) {
 
-        //resgatar id da empesa a qual pertence o agendamento
-        const user = await prisma.usuarios.findFirst({
-            where: {
-                session: {
-                    some: {
-                        idSession: {
-                            equals: req.session.sessionId
-                        }
-                    }
-                }
-            }, select: {
-                empresa: {
-                    select: {
-                        idEmpresa: true
-                    }
-                }
-            }
-        })
+        //Resgatar id da empesa a qual pertence o agendamento
+        const id = getID.empresa(req.session.sessionId)
 
         //converter data e hora
         const data = req.body.data.split('/')
@@ -34,7 +18,7 @@ module.exports = {
                 horarioAgendamento: dataHoraISO,
                 clienteId: req.body.idCliente,
                 prestadorId: req.body.idPrestador,
-                empresaId: user.empresa.idEmpresa
+                empresaId: id
             }
         })
 
@@ -60,13 +44,11 @@ module.exports = {
     },
     async filtrarData(req, res) {
 
+        
+        
+
         //Obter o id da empresa que está logada 
-        const sessionId = req.session.sessionId
-        const empresa = await prisma.$queryRaw`
-        SELECT usuarios.empresaId FROM usuarios, session 
-        WHERE usuarios.idUsuario = session.usuarioId
-        AND session.idSession = ${sessionId}`
-        const id = empresa[0].empresaId
+        const id = await getID.empresa(req.session.sessionId);
 
         //Converter data 
         const data = req.body.data.split('/').reverse().join('-')
@@ -113,7 +95,7 @@ module.exports = {
             const dataHora = agendamento.horarioAgendamento
             
             const data = new Date(dataHora).toLocaleDateString();
-            const horario = new Date(dataHora).toDateString().substring(11,16)
+            const horario = new Date(dataHora).toISOString().substring(11,16)
 
             const objAg = {//estrutura de objeto que representa cada agendamento
                 nome: agendamento.nomeCliente,

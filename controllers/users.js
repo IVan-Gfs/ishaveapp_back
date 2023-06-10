@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { encryptPassword, verifyPassword, gerarURL, decryiptURL } = require('./cripto.js')
+const { encryptPassword, verifyPassword, gerarURL, decryiptURL } = require('./resource/cripto.js')
 const transporter = require('../config/mailprovider.js')
 const emailValidator = require('email-validator');
 
@@ -60,7 +60,9 @@ module.exports = {
     
 
     //Antes do cadastro, desencripitar os dados:
-    const todosDados = decryiptURL(req.body.dataQuery.encryptedData, req.body.dataQuery.iv)
+  
+    const todosDados = decryiptURL(req.query.d, req.query.v)
+    //Checar existencia do usuário
     const usuarioExistente = await prisma.usuarios.count({
       where: {
         nomeUsuario: todosDados.usuario.nomeUsuario,
@@ -71,7 +73,7 @@ module.exports = {
     var message = '';
     var registered = true
     if (usuarioExistente > 0) {
-      message = "Usuário já foi cadastrado, realize o "
+      message = "Usuário já foi cadastrado, realize o login "
     } else {
       //Buscar por url no banco para determinar se está válida.
       const urlRecord = await prisma.urlConfirm.findMany({
@@ -151,6 +153,7 @@ module.exports = {
       }
     })
     var message;
+    var sessionID
     if(userdata){
       if(verifyPassword(senha, userdata.senhaUsuario)){
         message = 'Logado'
@@ -160,6 +163,7 @@ module.exports = {
           }
         })
         req.session.sessionId = session.idSession;
+        sessionID = session.idSession
        
       }else{
         message = 'Senha ou E-mail Inválido'
@@ -167,7 +171,7 @@ module.exports = {
     }else{
       message = 'E-mail ou senha inválido'  
     }
-    res.json({message}) 
+    res.json({message, sessionID}) 
     
   },
   async logout(req,res){

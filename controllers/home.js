@@ -31,12 +31,11 @@ module.exports = {
         const id = usuario.empresa.idEmpresa
         const agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
-        FROM agendamento, cliente, prestador, servico
+        FROM agendamento, cliente, prestador
         WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${id} 
         AND agendamento.clienteId=cliente.idCliente
         AND agendamento.prestadorId=prestador.idPrestador
         ORDER BY horarioAgendamento DESC`   
-
         //Estruturar array de agendamentos que será enviado como resposta 
         const agendamentos = []
         for (const agendamento of agendamentosBD) {

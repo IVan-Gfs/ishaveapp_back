@@ -1,21 +1,12 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { encryptPassword } = require('./cripto')
+const { encryptPassword } = require('./resource/cripto')
+const getID = require('./resource/pegarId');
+const { verify } = require("../config/mailprovider");
 
 module.exports = {
   async store(req, res) {
-    const user = await prisma.usuarios.findFirst({
-      where: {
-        session: {
-          some: {
-            idSession: {
-              equals: req.session.sessionId
-            }
-          }
-        }
-      },
-      include: { empresa: true }
-    })
+   const id = await getID.empresa(req.session.sessionId)
 
     const senha = req.body.prestador.senhaPrestador
     const email = req.body.prestador.emailPrestador
@@ -28,7 +19,7 @@ module.exports = {
         emailUsuario: email,
         senhaUsuario: encryptPassword(senha),
         prestadorId: prestador.idPrestador,
-        empresaId: user.empresaId
+        empresaId: id
       }
     })
     console.log(prestadorUser)
@@ -51,7 +42,59 @@ module.exports = {
 
   },
   async index(req, res) {
-    const prestadores = await prisma.prestador.findMany();
-    res.json(prestadores);
+
+   const id = await getID.empresa(req.session.sessionId)
+   console.log(id)
+   const prestadorUser = await prisma.usuarios.findMany({
+    where:{
+      empresaId:{
+        equals: id
+      },
+      prestadorId:{
+        not: null
+      } 
+    },
+    select:{
+      prestador: true,
+    }
+   })
+   const prestadores = []
+   for (let i = 0; i < prestadorUser.length; i++ ) {
+
+    const objP = {
+      nome: prestadorUser[i].prestador.nomePrestador,
+      telefone: prestadorUser[i].prestador.telPrestador,
+      cpf: prestadorUser[i].prestador.cpfPrestador,
+      dataDeNascimento: prestadorUser[i].prestador.dataNascPrestador,
+      servicos:[]
+    }
+    const idP = prestadorUser[i].prestador.idPrestador
+    const servicos = await prisma.$queryRaw`
+    SELECT servico.* FROM servico, servico_prestador
+    WHERE servico_prestador.servicoId =  servico.idServico
+    AND servico_prestador.prestadorId = ${idP}`
+
+    for(servico of servicos){
+      objP.servicos.push(servico.nomeServico)
+    }
+    prestadores.push(objP)
+   } 
+  
+  
+  
+    res.json({ prestadores})
+    
   },
-};
+  async verify(req, res, next){
+    const prestadorExiste = await prisma.usuarios.count({
+      where: {
+        emailUsuario: req.body.prestador.emailPrestador
+      }
+    })
+    if(prestadorExiste){
+      res.json({message:'Este email já está cadastrado'})
+    }else{
+      next()
+    }
+  }
+}

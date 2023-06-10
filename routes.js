@@ -18,7 +18,7 @@ router.post('/cadastrar-servico', Servico.store)
 router.get('/consultar-servicos', Servico.index)
 
 //prestador routes
-router.post('/cadastrar-prestador', Prestador.store)
+router.post('/cadastrar-prestador', Prestador.verify, Prestador.store)
 router.get('/consultar-prestadores', Prestador.index)
 
 //agendamento routes 
@@ -29,15 +29,15 @@ router.get('/filtrar-data', Agendamento.filtrarData)
 
 //login routes 
 router.post('/sign-up', User.userexists, User.sendData)
-router.post('/confirmMail', User.register)
+router.get('/confirmMail', User.register)
 router.get('/verify-cod', User.verifyCod);
 router.post('/sign-in', User.logar)
 router.delete('/logout', User.logout)
 router.get('/home',Home.testSession, Home.getDataHome )
 
 // testUpload
-const upload = require('./controllers/multer')
-const ctrlUp = require('./controllers/picture')
+const upload = require('./controllers/resource/multer')
+const ctrlUp = require('./controllers/resource/picture')
 router.post('/upload', upload.single('file'), ctrlUp.ctrlUp )
 
 
