@@ -5,7 +5,7 @@ module.exports = {
     async store(req, res) {
 
         //Resgatar id da empesa a qual pertence o agendamento
-        const id = getID.empresa(req.session.sessionId)
+        const id = await getID.empresa(req.session.sessionId)
 
         //converter data e hora
         const data = req.body.data.split('/')

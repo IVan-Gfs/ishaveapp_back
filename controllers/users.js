@@ -9,7 +9,6 @@ const emailValidator = require('email-validator');
 
 module.exports = {
   async sendData(req, res) {
-    console.log('acessou a rota')
     const dados = req.body;
     dados.usuario.nomeUsuario = dados.empresa.nomeEmpresa
     const password = encryptPassword(dados.usuario.senhaUsuario);
@@ -18,9 +17,11 @@ module.exports = {
     const dataAtual = new Date();
     const experationTime = 0.25 * 60 * 60 * 1000;
     const expirationDate = new Date(dataAtual.getTime() + experationTime)
+    const dadosURL = gerarURL(dados)
+    console.log(dadosURL.query)
     const urlRecord = await prisma.urlConfirm.create({
       data: {
-        url: gerarURL(dados),
+        url: dadosURL.query,
         expires_at: expirationDate.toISOString()
       }
     })
@@ -35,7 +36,7 @@ module.exports = {
               <body>
               <div class="corpo">
                <p class="info">Para confirmar seu cadastro, acesse o link clicando no botão abaixo:</P>
-               <a class="btnConfirmar" href="http://${urlRecord.url}">Confirmar</a>
+               <a class="btnConfirmar" href="http://${dadosURL.url}">Confirmar</a>
                </div>
               </body>
             </html>`,
@@ -60,7 +61,7 @@ module.exports = {
     
 
     //Antes do cadastro, desencripitar os dados:
-  
+    console.log(req.query.d)
     const todosDados = decryiptURL(req.query.d, req.query.v)
     //Checar existencia do usuário
     const usuarioExistente = await prisma.usuarios.count({
@@ -76,10 +77,11 @@ module.exports = {
       message = "Usuário já foi cadastrado, realize o login "
     } else {
       //Buscar por url no banco para determinar se está válida.
+      const dadosURL = `d=${req.query.d}&v=${req.query.v}`
       const urlRecord = await prisma.urlConfirm.findMany({
         where: {
           url: {
-            equals: req.body.url.substring('7')
+            equals: dadosURL
           }
         }
       });

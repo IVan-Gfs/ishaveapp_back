@@ -32,7 +32,7 @@ const gerarURL = (dados) => {
   });
   const url = `127.0.0.1:5500/ishaveapp_back/mail-front-end/confirmCad.html?${query}`; // construir url 
 
-  return url;
+  return {url, query};
 };
 
 
@@ -48,5 +48,4 @@ const decryiptURL = (url, ivHex) => {
 
   return JSON.parse(decryptedData);
 };
-
 module.exports = { encryptPassword, verifyPassword, gerarURL, decryiptURL };
