@@ -18,7 +18,6 @@ module.exports = {
     const experationTime = 0.25 * 60 * 60 * 1000;
     const expirationDate = new Date(dataAtual.getTime() + experationTime)
     const dadosURL = gerarURL(dados)
-    console.log(dadosURL.query)
     const urlRecord = await prisma.urlConfirm.create({
       data: {
         url: dadosURL.query,
@@ -61,7 +60,6 @@ module.exports = {
     
 
     //Antes do cadastro, desencripitar os dados:
-    console.log(req.query.d)
     const todosDados = decryiptURL(req.query.d, req.query.v)
     //Checar existencia do usuário
     const usuarioExistente = await prisma.usuarios.count({
@@ -119,7 +117,7 @@ module.exports = {
         emailUsuario: req.body.usuario.emailUsuario
       },
     });
-    console.log(qtdUserWithData)
+    
     if (qtdUserWithData > 0) {
       res.json({message:'Usuário já existente, faça o login.'});
     } else {
