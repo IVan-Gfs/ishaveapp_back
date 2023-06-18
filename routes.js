@@ -11,6 +11,7 @@ const Home = require('./controllers/home')
 //cliente routes
 router.post('/cadastrar-cliente', Cliente.checkClient, Cliente.store)
 router.get('/consultar-clientes', Cliente.index)
+router.get('/filtrar-clientes', Cliente.filtrarClentes)
 
 
 //servico routes
@@ -22,7 +23,8 @@ router.post('/cadastrar-prestador', Prestador.verify, Prestador.store)
 router.get('/consultar-prestadores', Prestador.index)
 
 //agendamento routes 
-router.post('/agendar', Agendamento.store)
+router.post('/agendar',Cliente.noFilterCpf, Agendamento.store)
+router.get('/filtrar-cliente', Agendamento.filterCliente)
 router.get('/consultar-agendamentos', Agendamento.index)
 router.get('/filtrar-data', Agendamento.filtrarData)
 
@@ -37,7 +39,8 @@ router.get('/home',Home.testSession, Home.getDataHome )
 
 // testUpload
 const upload = require('./controllers/resource/multer')
-const ctrlUp = require('./controllers/resource/picture')
+const ctrlUp = require('./controllers/resource/picture');
+const agendamento = require('./controllers/agendamento');
 router.post('/upload', upload.single('file'), ctrlUp.ctrlUp )
 
 

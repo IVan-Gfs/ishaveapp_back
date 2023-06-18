@@ -1,11 +1,29 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient;
-const getID = require('./resource/pegarId.js')
+const getID = require('./resource/pegarId.js');
+const cliente = require("./cliente.js");
 module.exports = {
     async store(req, res) {
 
+
         //Resgatar id da empesa a qual pertence o agendamento
-        const id = await getID.empresa(req.session.sessionId)
+        const idE = await getID.empresa(req.session.sessionId)
+
+        console.log(req.body.cliente.idCliente)
+        //Resgatar o id do cliente 
+        let idC = req.body.cliente.idCliente
+        if (!idC) {//Se o cliente não for existente, criar um cliente
+            const nome = req.body.cliente.nome + " " + req.body.cliente.sobrenome
+            const newCliente = await prisma.cliente.create({
+                data: {
+                    nomeCliente: nome,
+                    telCliente: req.body.cliente.telefone,
+                    cpfCliente: req.body.cliente.cpf,
+                    emailCliente: req.body.cliente.email
+                }
+            })
+            idC = newCliente.idCliente
+        }
 
         //converter data e hora
         const data = req.body.data.split('/')
@@ -16,9 +34,9 @@ module.exports = {
         const agendamento = await prisma.agendamento.create({
             data: {
                 horarioAgendamento: dataHoraISO,
-                clienteId: req.body.idCliente,
+                clienteId: idC,
                 prestadorId: req.body.idPrestador,
-                empresaId: id
+                empresaId: idE
             }
         })
 
@@ -37,15 +55,34 @@ module.exports = {
         agendamento.Id_servicos = req.body.idServices
         res.json({ message: "Agendamento realizado com sucesso.", info_Ag: agendamento })
     },
+    async filterCliente(req, res) {
 
+        filtro = req.body;
+        var clienteQuery = null;
+        var cliente = null
+
+        if (filtro.cpf) {
+            clienteQuery = await prisma.cliente.findUnique({
+                where: { cpfCliente: filtro.cpf }
+            })
+            cliente = clienteQuery
+        } else {
+            clienteQuery = await prisma.cliente.findMany({
+                where: { telCliente: filtro.telefone }
+            })
+            cliente = clienteQuery[clienteQuery.length - 1]
+            
+        }
+        res.json({ cliente })
+    },
     async index(req, res) {
         const agendamentos = await prisma.agendamento.findMany();
         res.json(agendamentos);
     },
     async filtrarData(req, res) {
 
-        
-        
+
+
 
         //Obter o id da empresa que está logada 
         const id = await getID.empresa(req.session.sessionId);
@@ -57,7 +94,7 @@ module.exports = {
         var agendamentosBD = null
         if (data.length == 10) {//Buscar pela data completa (ex: 08/02/2024 )
 
-        agendamentosBD = await prisma.$queryRaw`
+            agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
         FROM agendamento, cliente, prestador
         WHERE DATE(horarioAgendamento) = ${data} AND empresaId = ${id} 
@@ -68,7 +105,7 @@ module.exports = {
         } else if (data.length == 7) {//Buscar pelo mês em algum ano (ex: 02/2024)
 
             const [ano, mês] = data.split('-')
-        agendamentosBD = await prisma.$queryRaw`
+            agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
         FROM agendamento, cliente, prestador
         WHERE MONTH(horarioAgendamento) = ${mês} AND YEAR(horarioAgendamento) = ${ano} AND empresaId = ${id} 
@@ -79,7 +116,7 @@ module.exports = {
 
         } else {//Buscar somente pelo ano (ex: 2024)
 
-        agendamentosBD = await prisma.$queryRaw`
+            agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
         FROM agendamento, cliente, prestador, servico
         WHERE YEAR(horarioAgendamento) = ${data} AND empresaId = ${id} 
@@ -93,9 +130,9 @@ module.exports = {
         for (agendamento of agendamentosBD) {
 
             const dataHora = agendamento.horarioAgendamento
-            
+
             const data = new Date(dataHora).toLocaleDateString();
-            const horario = new Date(dataHora).toISOString().substring(11,16)
+            const horario = new Date(dataHora).toISOString().substring(11, 16)
 
             const objAg = {//estrutura de objeto que representa cada agendamento
                 nome: agendamento.nomeCliente,
@@ -117,11 +154,11 @@ module.exports = {
                     nome: servicos[i].nomeServico,
                     preco: preco.toFixed(2),
                     descricao: servicos[i].descricaoServico
-                }   
+                }
                 objAg.servicos.push(servico)
-                  
+
             }
-            agendamentos.push(objAg)        
+            agendamentos.push(objAg)
 
         }
 
@@ -129,6 +166,9 @@ module.exports = {
         res.json({ agendamentos })
 
 
+
+    },
+    async agendar(req, res) {
 
     }
 }

@@ -179,6 +179,7 @@ module.exports = {
       message = 'E-mail ou senha inválido'  
     }
     console.log('Sessão: '+idSession)
+    
     res.json({message, idSession}) 
     
   },
