@@ -144,38 +144,47 @@ module.exports = {
 
   },
   async logar(req, res) {
+    
+    //Obtém os dados da requisição por desestruturação 
     const {emailUsuario: email, senhaUsuario: senha} = req.body
-  
+
+    //Busca um usuário pelo e-mail
     const userdata = await prisma.usuarios.findUnique({
       where: {
         emailUsuario: email
         
       }
     })
+    
+    //Valor incial para o caso das credenciais incorretas 
+    var idSession = 0
     var message;
-    var sessionID
-    if(userdata){
+    if(userdata){//Caso o e-mail esteja correto, verifica a senha
       if(verifyPassword(senha, userdata.senhaUsuario)){
-        message = 'Logado'
+
+        //Se a senha estiver correta, registra uma sessão 
         const session = await prisma.session.create({
           data: {
            usuarioId: userdata.idUsuario
           }
         })
+        
         req.session.sessionId = session.idSession;
-        sessionID = session.idSession
-       
+        idSession = session.idSession
+        message = 'Logado'
       }else{
         message = 'Senha ou E-mail Inválido'
       }  
     }else{
       message = 'E-mail ou senha inválido'  
     }
-    res.json({message, sessionID}) 
+    console.log('Sessão: '+idSession)
+    res.json({message, idSession}) 
     
   },
   async logout(req,res){
-    delete req.session.sessionId;
-    res.json({message:'Logout efetuado'})
+    delete req.session.sessionId
+
+    res.status(401).json({message:'Logout efetuado'})
   }
 };
