@@ -28,4 +28,4 @@ app.use(
 );
 app.use(router);
 
-app.listen();
+app.listen(process.env.PORT || 5000);
