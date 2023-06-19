@@ -10,7 +10,7 @@ const Home = require("./controllers/home");
 
 //cliente routes
 router.get("/", (req, res) => {
-  res.json({ message: "Hello world" });
+  res.json({ message: "Hello world2" });
 });
 
 router.post("/cadastrar-cliente", Cliente.checkClient, Cliente.store);
