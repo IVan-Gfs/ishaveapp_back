@@ -51,12 +51,13 @@ model servico {
   nomeServico      String                 @db.VarChar(50)
   precoServico     Decimal                @db.Decimal(6, 2)
   descricaoServico String?                @db.VarChar(200)
-  categoriaServico String?                 @db.VarChar(100)
+  categoriaServico String?                @db.VarChar(100)
   empresaId        Int
   empresa          empresa                @relation(fields: [empresaId], references: [idEmpresa])
-  @@index([empresaId])
   prestadores      servico_prestador[]
   AgSvc            agendamento_servicos[]
+
+  @@index([empresaId])
 }
 
 model empresa {
@@ -68,7 +69,7 @@ model empresa {
   endereco    endereco      @relation(fields: [enderecoId], references: [idEndereco])
   usuario     usuarios[]
   agendamento agendamento[]
-  servico servico[]
+  servico     servico[]
 
   @@index([enderecoId])
 }
