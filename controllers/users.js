@@ -97,7 +97,7 @@ module.exports = {
           }
         }
       });
-
+      
       //Converter datas para dados numéricos para comparação
       const dataAtual = new Date().getTime();
       const expiresDate = Date.parse(urlRecord[0].expires_at)

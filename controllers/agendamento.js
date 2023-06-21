@@ -9,21 +9,10 @@ module.exports = {
         //Resgatar id da empesa a qual pertence o agendamento
         const idE = await getID.empresa(req.session.sessionId)
 
-        console.log(req.body.cliente.idCliente)
+        console.log(req.body.idCliente)
         //Resgatar o id do cliente 
-        let idC = req.body.cliente.idCliente
-        if (!idC) {//Se o cliente não for existente, criar um cliente
-            const nome = req.body.cliente.nome + " " + req.body.cliente.sobrenome
-            const newCliente = await prisma.cliente.create({
-                data: {
-                    nomeCliente: nome,
-                    telCliente: req.body.cliente.telefone,
-                    cpfCliente: req.body.cliente.cpf,
-                    emailCliente: req.body.cliente.email
-                }
-            })
-            idC = newCliente.idCliente
-        }
+        let idC = req.body.idCliente
+        
 
         //converter data e hora
         const data = req.body.data.split('/')
