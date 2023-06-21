@@ -27,7 +27,7 @@ router.get("/consultar-prestadores", Prestador.index);
 
 //agendamento routes 
 router.post('/agendar',Cliente.noFilterCpf, Agendamento.store)
-router.get('/filtrar-cliente', Agendamento.filterCliente)
+router.get('/filtrar-cliente', Cliente.filterCliente)
 router.get('/consultar-agendamentos', Agendamento.index)
 router.get('/filtrar-data', Agendamento.filtrarData)
 
