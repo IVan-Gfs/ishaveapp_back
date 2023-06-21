@@ -41,7 +41,7 @@ const gerarURL = (dados) => {
 };
 
 const decryiptURL = (url, ivHex) => {
-  console.log(ivHex)
+
   const iv = Buffer.from(ivHex, "hex");
   const decipher = crypto.createDecipheriv(
     "aes-256-cbc",

@@ -8,12 +8,13 @@ const Agendamento = require("./controllers/agendamento");
 const User = require("./controllers/users");
 const Home = require("./controllers/home");
 
-//cliente routes
+
 router.get("/", (req, res) => {
   res.json({ message: "Hello world2" });
 });
-router.get('/filtrar-clientes', Cliente.filtrarClentes)
 
+//cliente routes
+router.get('/filtrar-clientes', Cliente.filtrarClentes)
 router.post("/cadastrar-cliente", Cliente.checkClient, Cliente.store);
 router.get("/consultar-clientes", Cliente.index);
 
@@ -27,7 +28,7 @@ router.get("/consultar-prestadores", Prestador.index);
 
 //agendamento routes 
 router.post('/agendar',Cliente.noFilterCpf, Agendamento.store)
-router.get('/filtrar-cliente', Agendamento.filterCliente)
+router.get('/filtrar-cliente', Cliente.filterCliente)
 router.get('/consultar-agendamentos', Agendamento.index)
 router.get('/filtrar-data', Agendamento.filtrarData)
 

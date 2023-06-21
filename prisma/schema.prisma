@@ -62,7 +62,7 @@ model empresa {
   nomeEmpresa String        @db.VarChar(255)
   telEmpresa  String        @db.VarChar(20)
   enderecoId  Int           @unique
-  fotoEmpresa Int?
+  fotoEmpresa String?        @db.VarChar(255)
   endereco    endereco      @relation(fields: [enderecoId], references: [idEndereco])
   usuario     usuarios[]
   agendamento agendamento[]

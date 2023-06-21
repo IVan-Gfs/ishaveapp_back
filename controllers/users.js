@@ -70,9 +70,10 @@ module.exports = {
   },
   async register(req, res) {
     
-
+    
     //Antes do cadastro, desencripitar os dados:
     const todosDados = decryiptURL(req.query.d, req.query.v)
+  
     //Checar existencia do usuário
     const usuarioExistente = await prisma.usuarios.count({
       where: {
@@ -83,8 +84,9 @@ module.exports = {
     })
     var message = '';
     var registered = true
-    if (usuarioExistente > 0) {
-      message = "Usuário já foi cadastrado, realize o login "
+   
+    if (usuarioExistente > 0) { 
+      message = "Usuário já foi cadastrado, realize o login"
     } else {
       //Buscar por url no banco para determinar se está válida.
       const dadosURL = `d=${req.query.d}&v=${req.query.v}`
@@ -99,7 +101,7 @@ module.exports = {
       //Converter datas para dados numéricos para comparação
       const dataAtual = new Date().getTime();
       const expiresDate = Date.parse(urlRecord[0].expires_at)
-
+      var expired = false;
       //Tratativa final para registro de dados e resposta 
       if (expiresDate > dataAtual) {
         // Realizar cadastro ---
@@ -113,18 +115,19 @@ module.exports = {
         const usuario = await prisma.usuarios.create({ data: todosDados.usuario })
 
         if (endereco && empresa && usuario) {
-          message = 'Cadastro Confirmado com sucesso, realize o '
+          message = 'Cadastro Confirmado com sucesso, realize o login.'
         } else {
           message = 'Algo inesperado aconteceu.'
           registered = false
         }
       } else {
         registered = false
+        expired = true
         message = 'Ops.. Você demorou demais para confirmar seu cadastro. Realize o cadastro novamente.'
       }
     }
 
-    res.send({ message, registered })
+    res.send({ message, registered, expired })
   },
   async userexists(req, res, next) {
     const qtdUserWithData = await prisma.usuarios.count({
