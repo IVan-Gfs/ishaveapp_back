@@ -26,18 +26,6 @@ module.exports = {
        
         res.json({ message, id})
     },
-    async index(req, res) {
-        //Busca por todos os clientes que foram agendados alguma vez
-        const id = await getID.empresa(req.session.sessionId)
-        const clientes = await prisma.$queryRaw`
-        SELECT cliente.* FROM cliente, agendamento
-        WHERE cliente.idCliente=agendamento.clienteId
-        AND agendamento.empresaId=${id}
-        `
-        res.json(clientes)
-
-    },
-
     async checkClient(req, res, next) {
         const qtdClientWithCpf = await prisma.cliente.count({
             where: {
@@ -52,11 +40,47 @@ module.exports = {
         }
 
     },
+    async index(req, res) {
+        //Busca por todos os clientes que foram agendados alguma vez
+        const id = await getID.empresa(req.session.sessionId)
+        const clientes = await prisma.$queryRaw`
+        SELECT cliente.* FROM cliente, agendamento
+        WHERE cliente.idCliente=agendamento.clienteId
+        AND agendamento.empresaId=${id}
+        `
+        res.json(clientes)
+
+    },
+    async filterCliente(req, res) {
+
+        filtro = req.body;
+        var clienteQuery = null;
+        var cliente = null
+
+        if (filtro.cpf) {
+            clienteQuery = await prisma.cliente.findUnique({
+                where: { cpfCliente: filtro.cpf }
+            })
+            cliente = clienteQuery
+        } else {
+            clienteQuery = await prisma.cliente.findMany({
+                where: { telCliente: filtro.telefone }
+            })
+            cliente = clienteQuery[clienteQuery.length - 1]
+            
+        }
+        res.json({ cliente })
+    },
     async filtrarClentes(req, res) {
         const ID = await getID.empresa(req.session.sessionId)
         var clientes;
         if (req.body.nome) {
-
+        
+          clientes = await prisma.empresa.findMany({
+            where:{
+                idEmpresa: ID
+            }
+          })
           clientes = await  prisma.cliente.findMany({
                 where: {
                   nomeCliente: {

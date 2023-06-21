@@ -1,15 +1,26 @@
 const css = `
 .corpo{
-    background-color: #795420ae;
+    background-color: #714f1eae;
     padding: 15px;
     height: 250px;
     border-radius: 4px;
+}
+.saud{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: #f2f3f3;
+    font-weight: bold;
+    display: inline-block;
 }
 .info{
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 1.3em;
     color: #f2f3f3;
    
+}
+.logo img{
+    width:250px;
+    heighh:250px;
+    float: right;
 }
 .btnConfirmar{
     display: inline-block;

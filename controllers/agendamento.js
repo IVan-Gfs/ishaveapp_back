@@ -55,26 +55,7 @@ module.exports = {
         agendamento.Id_servicos = req.body.idServices
         res.json({ message: "Agendamento realizado com sucesso.", info_Ag: agendamento })
     },
-    async filterCliente(req, res) {
-
-        filtro = req.body;
-        var clienteQuery = null;
-        var cliente = null
-
-        if (filtro.cpf) {
-            clienteQuery = await prisma.cliente.findUnique({
-                where: { cpfCliente: filtro.cpf }
-            })
-            cliente = clienteQuery
-        } else {
-            clienteQuery = await prisma.cliente.findMany({
-                where: { telCliente: filtro.telefone }
-            })
-            cliente = clienteQuery[clienteQuery.length - 1]
-            
-        }
-        res.json({ cliente })
-    },
+    
     async index(req, res) {
         const agendamentos = await prisma.agendamento.findMany();
         res.json(agendamentos);
@@ -170,5 +151,67 @@ module.exports = {
     },
     async agendar(req, res) {
 
+    },
+    async agendamentosDia(req,res){
+    const ID = await getID(req.session.sessionId)
+
+    const dataHora = new Date().toLocaleDateString()
+    const dataDehoje = dataHora.split('/').reverse().join('-')
+
+    //Buscar somente os agendamentos para o dia atual 
+    const id = usuario.empresa.idEmpresa
+    const agendamentosBD = await prisma.$queryRaw`
+    SELECT agendamento.*, cliente.nomeCliente, empresa.nomeEmpresa
+    FROM agendamento, cliente, prestador
+    WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${ID} 
+    AND agendamento.clienteId=cliente.idCliente
+    AND agendamento.empresaId=empresa.idEmpresa
+
+    ORDER BY horarioAgendamento DESC`   
+    //Estruturar array de agendamentos que será enviado como resposta 
+    const agendamentos = []
+    for (const agendamento of agendamentosBD) {
+
+        const dataHora = agendamento.horarioAgendamento
+        const data = new Date(dataHora).toLocaleDateString();
+        const horario = new Date(dataHora).toISOString().substring(11,16)     
+
+        const servicos = await prisma.agendamento_servicos.findMany({
+            where: {
+                agendamentoId: agendamento.idAgendamento
+            },
+            include: {
+                servico: {
+                    select: {
+                        nomeServico: true,
+                        precoServico: true,
+                        descricaoServico: true
+                    }
+                }
+            }
+        })
+
+        const objAg = {
+            nome: agendamento.nomeCliente,
+            data: data,
+            horario: horario,
+            servicos: [],
+            profissional: agendamento.nomeEmpresa
+        }
+
+        for (let i = 0; i < servicos.length; i++) {
+            const preco = parseFloat(servicos[i].servico.precoServico)
+            const servico = {
+                nome: servicos[i].servico.nomeServico,
+                preco: preco.toFixed(2),
+                descricao: servicos[i].servico.descricaoServico,
+            }
+
+            objAg.servicos.push(servico)
+        }
+        agendamentos.push(objAg)
+    }
+    //Enviar os dados para a home
+    res.status(200).json({agendamentos })
     }
 }

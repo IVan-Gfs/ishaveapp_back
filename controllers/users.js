@@ -3,9 +3,7 @@ const prisma = new PrismaClient();
 const { encryptPassword, verifyPassword, gerarURL, decryiptURL } = require('./resource/cripto.js')
 const transporter = require('../config/mailprovider.js')
 const emailValidator = require('email-validator');
-
-
-
+const path = require('path');
 
 module.exports = {
   async sendData(req, res) {
@@ -24,7 +22,7 @@ module.exports = {
         expires_at: expirationDate.toISOString()
       }
     })
-   
+    const caminhoImagem = path.join(__dirname, '..', 'config','logoIShaveApp.png');
     const css = require('../config/cssMail.js')
     var mailOptions = {
       from: "koauys23@gmail.com",
@@ -34,11 +32,25 @@ module.exports = {
               <head><style>${css}</style></head>
               <body>
               <div class="corpo">
+               <h1 class="saud">Olá, ${dados.usuario.nomeUsuario}!</h1>
+               <div class="logo">
+               <img src="cid:logoIShaveApp" alt="nós"/>
+               </div>
                <p class="info">Para confirmar seu cadastro, acesse o link clicando no botão abaixo:</P>
+               
                <a class="btnConfirmar" href="http://${dadosURL.url}">Confirmar</a>
+              
+               
                </div>
               </body>
             </html>`,
+      attachments:[
+        {
+          filename: '',
+          path: caminhoImagem,
+          cid: 'logoIShaveApp'
+        }
+      ]
     };
 
     if(emailValidator.validate(req.body.usuario.emailUsuario)){

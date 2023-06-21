@@ -44,6 +44,6 @@ router.get("/home", Home.testSession, Home.getDataHome);
 const upload = require("./controllers/resource/multer");
 const ctrlUp = require("./controllers/resource/picture");;
 const agendamento = require('./controllers/agendamento');
+const picture = require("./controllers/resource/picture");
 router.post("/upload", upload.single("file"), ctrlUp.ctrlUp);
-
 module.exports = router;
