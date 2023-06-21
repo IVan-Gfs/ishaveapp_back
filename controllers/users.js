@@ -93,6 +93,9 @@ module.exports = {
         // Realizar cadastro ---
         const endereco = await prisma.endereco.create({ data: todosDados.endereco })
         todosDados.empresa.enderecoId = endereco.idEndereco
+        if(!todosDados.empresa.fotoEmpresa){
+          todosDados.empresa.fotoEmpresa = '/assets/images/perfil/defaultPerfil.png'
+        }
         const empresa = await prisma.empresa.create({ data: todosDados.empresa })
         todosDados.usuario.empresaId = empresa.idEmpresa
         const usuario = await prisma.usuarios.create({ data: todosDados.usuario })

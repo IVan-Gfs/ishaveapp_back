@@ -4,10 +4,27 @@ const getID = require('./resource/pegarId')
 
 module.exports = {
     async store(req, res) {
-        
-        const cliente = await prisma.cliente.create({ data: req.body })
-
-        res.json(cliente)
+        var cliente
+        var message
+        var id = 0
+        const nomeCompleto = req.body.nome+' '+req.body.sobrenome
+        try{
+            cliente = await prisma.cliente.create({ 
+                data:{
+                    nomeCliente: nomeCompleto,
+                    telCliente: req.body.telefone,
+                    cpfCliente: req.body.cpf,
+                    emailCliente: req.body.email,
+                    dataNascCliente: req.body.dataNasc
+                }
+             })
+            message = 'Cliente cadastrado com sucesso'
+            id = cliente.idCliente
+        }catch(e){
+            message = 'Algo deu errado, Cliente não cadastrado'
+        }
+       
+        res.json({ message, id})
     },
     async index(req, res) {
         //Busca por todos os clientes que foram agendados alguma vez
@@ -24,13 +41,14 @@ module.exports = {
     async checkClient(req, res, next) {
         const qtdClientWithCpf = await prisma.cliente.count({
             where: {
-                cpfCliente: req.body.cpfCliente
+                cpfCliente: req.body.cpf
             }
         })
         if (qtdClientWithCpf < 1) {
             next()
         } else {
             res.json({ message: 'CPF equivalente!' })
+            console.log(qtdClientWithCpf)
         }
 
     },
@@ -42,26 +60,25 @@ module.exports = {
           clientes = await  prisma.cliente.findMany({
                 where: {
                   nomeCliente: {
-                    contains: req.body.nome
+                    startsWith: req.body.nome
                   }
                 }
               })
 
          } else if(req.body.telefone){
-
+            
             clientes = await prisma.cliente.findMany({
                 where:{
                     telCliente:{
-                        contains: req.body.telefone
+                        startsWith: req.body.telefone
                     }
                 }
             })
-
          }else{
             clientes = await prisma.cliente.findMany({
                 where:{
                     cpfCliente:{
-                        contains: req.body.cpf
+                        startsWith: req.body.cpf
                     }
                 }
             })

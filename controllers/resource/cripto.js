@@ -25,7 +25,7 @@ const verifyPassword = (pass, hashedPass) => {
 
 const gerarURL = (dados) => {
   const iv = crypto.randomBytes(16); //gerar vetor de inicialização, com comprimento de 16 bytes
-  const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(secret)); // gerar cipher, passando o alg, secret e iv
+  const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(secret),iv); // gerar cipher, passando o alg, secret e iv
   let encryptedData = cipher.update(JSON.stringify(dados), "utf-8", "hex"); //encriptar os dados
   encryptedData += cipher.final("hex"); //
 
@@ -41,6 +41,7 @@ const gerarURL = (dados) => {
 };
 
 const decryiptURL = (url, ivHex) => {
+  console.log(ivHex)
   const iv = Buffer.from(ivHex, "hex");
   const decipher = crypto.createDecipheriv(
     "aes-256-cbc",
