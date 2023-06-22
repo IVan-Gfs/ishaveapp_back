@@ -5,6 +5,13 @@ const prisma = new PrismaClient;
 
 module.exports = {
     async store(req, res){
+
+        if(req.body.precoServico.includes(',')){
+            const [real, centavo] = req.body.precoServico.split(',')
+            const preco = real+'.'+centavo
+            req.body.precoServico = parseFloat(preco)
+        }
+
         const ID = await getID.empresa(req.session.sessionId)
         req.body.empresaId = ID
         const servico = await prisma.servico.create({data: req.body})    
