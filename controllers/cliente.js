@@ -1,30 +1,31 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
-const getID = require('./resource/pegarId')
+const getID = require('./resource/pegarId');
+const agendamento = require('./agendamento');
 
 module.exports = {
     async store(req, res) {
         var cliente
         var message
         var id = 0
-        const nomeCompleto = req.body.nome+' '+req.body.sobrenome
-        try{
-            cliente = await prisma.cliente.create({ 
-                data:{
+        const nomeCompleto = req.body.nome + ' ' + req.body.sobrenome
+        try {
+            cliente = await prisma.cliente.create({
+                data: {
                     nomeCliente: nomeCompleto,
                     telCliente: req.body.telefone,
                     cpfCliente: req.body.cpf,
                     emailCliente: req.body.email,
                     dataNascCliente: req.body.dataNasc
                 }
-             })
+            })
             message = 'Cliente cadastrado com sucesso'
             id = cliente.idCliente
-        }catch(e){
+        } catch (e) {
             message = 'Algo deu errado, Cliente não cadastrado'
         }
-       
-        res.json({ message, id})
+
+        res.json({ message, id })
     },
     async checkClient(req, res, next) {
         const qtdClientWithCpf = await prisma.cliente.count({
@@ -53,79 +54,74 @@ module.exports = {
     },
     async filterCliente(req, res) {
 
-        filtro = req.body;
-        var clienteQuery = null;
-        var cliente = null
-
+        const filtro = req.body;
+        var cliente = [];
         if (filtro.cpf) {
-            clienteQuery = await prisma.cliente.findUnique({
+            console.log(filtro.cpf)
+            cliente = await prisma.cliente.findUnique({
                 where: { cpfCliente: filtro.cpf }
             })
-            cliente = clienteQuery
         } else {
-            clienteQuery = await prisma.cliente.findMany({
-                where: { telCliente: filtro.telefone }
+            cliente = await prisma.cliente.findMany({
+                where: {
+                    nomeCliente: {
+                        startsWith: filtro.nome
+                    }
+                }
             })
-            cliente = clienteQuery[clienteQuery.length - 1]
-            
         }
-        res.json({ cliente })
+        const message = cliente.length ? 'Resultados correspondentes:' : 'Nenhum resultado correspondente.'
+        res.json({ message, cliente })
     },
     async filtrarClentes(req, res) {
         const ID = await getID.empresa(req.session.sessionId)
         var clientes;
         if (req.body.nome) {
-        
-          clientes = await prisma.empresa.findMany({
-            where:{
-                idEmpresa: ID
-            }
-          })
-          clientes = await  prisma.cliente.findMany({
-                where: {
-                  nomeCliente: {
-                    startsWith: req.body.nome
-                  }
-                }
-              })
 
-         } else if(req.body.telefone){
-            
             clientes = await prisma.cliente.findMany({
-                where:{
-                    telCliente:{
+                where: {
+                    agendamento: {
+                        some: {
+                            empresaId: ID
+                        }
+                    },
+                    nomeCliente: {
+                        startsWith: req.body.nome
+                    }
+                }
+            });
+
+        } else if (req.body.telefone) {
+            clientes = await prisma.cliente.findMany({
+                where: {
+                    agendamento: {
+                        some: {
+                            empresaId: ID
+                        }
+                    },
+                    telCliente: {
                         startsWith: req.body.telefone
                     }
                 }
-            })
-         }else{
-            clientes = await prisma.cliente.findMany({
-                where:{
-                    cpfCliente:{
-                        startsWith: req.body.cpf
+            });
+        } else {
+
+            clientes = await prisma.cliente.findFirst({
+                where: {
+                    agendamento: {
+                        some: {
+                            empresaId: ID
+                        }
+                    },
+                    cpfCliente: {
+                        equals: req.body.cpf
                     }
                 }
-            })
-         }
-         var message = clientes.length ? 'Resultados correspondentes: ' : 'Nenhum resultado correspondente :('
-         
-        res.json({message, clientes })
-    },
-    async noFilterCpf(req, res, next) {//Caso o cpf seja informado sem filtrar, encontrá-lo e passar adiante
-        if (req.body.cliente.cpf) {
-
-            const cliente = await prisma.cliente.findUnique({
-                where: { cpfCliente: req.body.cliente.cpf }
-            })
-
-            if (cliente) {
-                req.body.cliente.idCliente = cliente.idCliente
-
-            }
+            });
         }
+        var message = clientes ? 'Resultados correspondentes: ' : 'Nenhum resultado correspondente :('
 
-        next()
-
+        res.json({ message, clientes })
     }
 
 

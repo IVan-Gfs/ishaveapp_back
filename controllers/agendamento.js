@@ -1,7 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient;
 const getID = require('./resource/pegarId.js');
-const cliente = require("./cliente.js");
 module.exports = {
     async store(req, res) {
 
@@ -51,9 +50,6 @@ module.exports = {
     },
     async filtrarData(req, res) {
 
-
-
-
         //Obter o id da empresa que está logada 
         const id = await getID.empresa(req.session.sessionId);
 
@@ -65,33 +61,30 @@ module.exports = {
         if (data.length == 10) {//Buscar pela data completa (ex: 08/02/2024 )
 
             agendamentosBD = await prisma.$queryRaw`
-        SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
-        FROM agendamento, cliente, prestador
+        SELECT agendamento.*, cliente.nomeCliente
+        FROM agendamento, cliente
         WHERE DATE(horarioAgendamento) = ${data} AND empresaId = ${id} 
         AND agendamento.clienteId=cliente.idCliente
-        AND agendamento.prestadorId=prestador.idPrestador
         ORDER BY horarioAgendamento DESC`
 
         } else if (data.length == 7) {//Buscar pelo mês em algum ano (ex: 02/2024)
 
             const [ano, mês] = data.split('-')
             agendamentosBD = await prisma.$queryRaw`
-        SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
-        FROM agendamento, cliente, prestador
+        SELECT agendamento.*, cliente.nomeCliente
+        FROM agendamento, cliente
         WHERE MONTH(horarioAgendamento) = ${mês} AND YEAR(horarioAgendamento) = ${ano} AND empresaId = ${id} 
         AND agendamento.clienteId=cliente.idCliente
-        AND agendamento.prestadorId=prestador.idPrestador
        
         ORDER BY horarioAgendamento DESC`
 
         } else {//Buscar somente pelo ano (ex: 2024)
 
             agendamentosBD = await prisma.$queryRaw`
-        SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
-        FROM agendamento, cliente, prestador, servico
+        SELECT agendamento.*, cliente.nomeCliente
+        FROM agendamento, cliente
         WHERE YEAR(horarioAgendamento) = ${data} AND empresaId = ${id} 
         AND agendamento.clienteId=cliente.idCliente
-        AND agendamento.prestadorId=prestador.idPrestador
         ORDER BY horarioAgendamento DESC`
         }
 
@@ -108,8 +101,7 @@ module.exports = {
                 nome: agendamento.nomeCliente,
                 data: data,
                 horario: horario,
-                servicos: [],
-                profissional: agendamento.nomePrestador
+                servicos: []
             }
             const servicos = await prisma.$queryRaw`
               SELECT servico.* FROM servico, agendamento, agendamento_servicos
@@ -135,26 +127,22 @@ module.exports = {
         // Enviar array de agendamentos filtrados
         res.json({ agendamentos })
 
-
-
     },
     async agendar(req, res) {
 
     },
     async agendamentosDia(req,res){
-    const ID = await getID(req.session.sessionId)
+    const ID = await getID.empresa(req.session.sessionId)
 
     const dataHora = new Date().toLocaleDateString()
     const dataDehoje = dataHora.split('/').reverse().join('-')
 
     //Buscar somente os agendamentos para o dia atual 
-    const id = usuario.empresa.idEmpresa
     const agendamentosBD = await prisma.$queryRaw`
-    SELECT agendamento.*, cliente.nomeCliente, empresa.nomeEmpresa
-    FROM agendamento, cliente, prestador
+    SELECT agendamento.*, cliente.nomeCliente
+    FROM agendamento, cliente
     WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${ID} 
     AND agendamento.clienteId=cliente.idCliente
-    AND agendamento.empresaId=empresa.idEmpresa
 
     ORDER BY horarioAgendamento DESC`   
     //Estruturar array de agendamentos que será enviado como resposta 
@@ -162,7 +150,9 @@ module.exports = {
     for (const agendamento of agendamentosBD) {
 
         const dataHora = agendamento.horarioAgendamento
+        
         const data = new Date(dataHora).toLocaleDateString();
+        console.log(data)
         const horario = new Date(dataHora).toISOString().substring(11,16)     
 
         const servicos = await prisma.agendamento_servicos.findMany({
