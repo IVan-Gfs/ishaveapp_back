@@ -30,7 +30,7 @@ module.exports = {
         })
 
         //associar um ou mais serviços ao agendamento 
-        if (req.body.idServices.length > 0) {
+        if (req.body.idServices) {
             req.body.idServices.forEach(async (servicoId) => {
                 await prisma.agendamento_servicos.create({
                     data: {

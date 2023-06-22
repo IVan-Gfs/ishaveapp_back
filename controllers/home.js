@@ -30,11 +30,10 @@ module.exports = {
         //Buscar somente os agendamentos para o dia atual 
         const id = usuario.empresa.idEmpresa
         const agendamentosBD = await prisma.$queryRaw`
-        SELECT agendamento.*, cliente.nomeCliente, prestador.nomePrestador
-        FROM agendamento, cliente, prestador
+        SELECT agendamento.*, cliente.nomeCliente
+        FROM agendamento, cliente
         WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${id} 
         AND agendamento.clienteId=cliente.idCliente
-        AND agendamento.prestadorId=prestador.idPrestador
         ORDER BY horarioAgendamento DESC`   
         //Estruturar array de agendamentos que será enviado como resposta 
         const agendamentos = []

@@ -44,8 +44,8 @@ module.exports = {
         //Busca por todos os clientes que foram agendados alguma vez
         const id = await getID.empresa(req.session.sessionId)
         const clientes = await prisma.$queryRaw`
-        SELECT cliente.* FROM cliente, agendamento
-        WHERE cliente.idCliente=agendamento.clienteId
+        SELECT DISTINCT cliente.* FROM cliente, agendamento
+        WHERE cliente.idCliente=agendamento.clienteId  
         AND agendamento.empresaId=${id}
         `
         res.json(clientes)
