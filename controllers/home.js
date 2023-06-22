@@ -3,9 +3,9 @@ const agendamento = require("./agendamento");
 const prisma = new PrismaClient();
 
 module.exports = {
-    //NOTA: existe a posibilidade de migrar esse código para o controller de agendamento.
     //Mas por enquanto, vamos deixar aqui.
     async getDataHome(req, res) {
+        console.log('rota home')
         //Obter dados do usuario ao logar
         const usuario = await prisma.usuarios.findFirst({
             where: {

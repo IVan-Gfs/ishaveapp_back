@@ -42,6 +42,7 @@ module.exports = {
 
     },
     async index(req, res) {
+       
         //Busca por todos os clientes que foram agendados alguma vez
         const id = await getID.empresa(req.session.sessionId)
         const clientesQuery = await prisma.$queryRaw`

@@ -132,6 +132,7 @@ module.exports = {
 
     },
     async agendamentosDia(req,res){
+        console.log('rota agendamentos dias')
     const ID = await getID.empresa(req.session.sessionId)
 
     const dataHora = new Date().toLocaleDateString()
