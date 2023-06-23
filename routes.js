@@ -40,7 +40,7 @@ router.get("/confirmMail", User.register);
 router.get("/verify-cod", User.verifyCod);
 router.post("/sign-in", User.logar);
 router.delete("/logout", User.logout);
-router.get("/home", Home.getDataHome);
+router.get("/home:sessionID", Home.getDataHome);
 
 // testUpload
 const upload = require("./controllers/resource/multer");

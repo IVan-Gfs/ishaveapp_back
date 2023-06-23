@@ -14,14 +14,11 @@ module.exports = {
         
 
         //converter data e hora
-        const data = req.body.data.split('/')
-        const dataISO = `${data[2]}-${data[1]}-${data[0]}`;
-        const dataHoraISO = `${dataISO}T${req.body.horario}:00.000Z`
 
         // cadastrar agendamento
         const agendamento = await prisma.agendamento.create({
             data: {
-                horarioAgendamento: dataHoraISO,
+                horarioAgendamento: req.body.data,
                 clienteId: idC,
                 prestadorId: req.body.idPrestador,
                 empresaId: idE

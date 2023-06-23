@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const agendamento = require("./agendamento");
+const { param } = require("../routes");
 const prisma = new PrismaClient();
 
 module.exports = {
@@ -12,7 +13,7 @@ module.exports = {
                 session: {
                     some: {
                         idSession: {
-                            equals: req.session.sessionId
+                            equals: req.params.sessionId
                         }
                     }
                 }
