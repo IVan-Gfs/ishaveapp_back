@@ -13,7 +13,7 @@ module.exports = {
                 session: {
                     some: {
                         idSession: {
-                            equals: req.params.sessionId
+                            equals: req.query.sessionId
                         }
                     }
                 }
