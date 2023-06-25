@@ -31,6 +31,16 @@ model cliente {
   cpfCliente   String?       @unique @db.VarChar(15)
   emailCliente String?       @db.VarChar(255)
   agendamento  agendamento[]
+  cliente_empresa cliente_empresa[]
+}
+model cliente_empresa {
+  idCliente_empresa Int @id @default(autoincrement())
+  clienteId         Int
+  empresaId         Int 
+  cliente      cliente @relation(fields: [clienteId], references: [idCliente])
+  empresa      empresa @relation(fields: [empresaId], references: [idEmpresa])
+  @@index([clienteId])
+  @@index([empresaId])
 }
 
 model servico {
@@ -58,6 +68,7 @@ model empresa {
   usuario     usuarios[]
   agendamento agendamento[]
   servico     servico[]
+  cliente_empresa cliente_empresa[]
 
   @@index([enderecoId])
 }

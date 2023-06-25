@@ -6,25 +6,34 @@ module.exports = {
     async store(req, res) {
         var cliente
         var message
-        var id = 0
+        const idSession = parseFloat(req.sessionID)
+        console.log("session: " + idSession)
+        const idE = await getID.empresa(idSession)
         const nomeCompleto = req.body.nome + ' ' + req.body.sobrenome
+
         try {
             cliente = await prisma.cliente.create({
                 data: {
                     nomeCliente: nomeCompleto,
                     telCliente: req.body.telefone,
                     cpfCliente: req.body.cpf,
-                    emailCliente: req.body.email,
-                    dataNascCliente: req.body.dataNasc
+                    emailCliente: req.body.email
                 }
             })
+            await prisma.cliente_empresa.create({
+                data: {
+                    clienteId: cliente.idCliente,
+                    empresaId: idE
+                }
+            })
+
             message = 'Cliente cadastrado com sucesso'
-            id = cliente.idCliente
         } catch (e) {
+
             message = 'Algo deu errado, Cliente não cadastrado'
         }
 
-        res.json({ message, id })
+        res.json({ message, cliente })
     },
     async checkClient(req, res, next) {
         const qtdClientWithCpf = await prisma.cliente.count({
@@ -41,16 +50,57 @@ module.exports = {
 
     },
     async index(req, res) {
-       
-        //Busca por todos os clientes que foram agendados alguma vez
-        const id = await getID.empresa(req.session.sessionId)
-        const clientesQuery = await prisma.$queryRaw`
-        SELECT DISTINCT cliente.* FROM cliente, agendamento
-        WHERE cliente.idCliente=agendamento.clienteId  
-        AND agendamento.empresaId=${id}
-        `
 
-        res.json(clientesQuery)
+        //Busca por todos os clientes que foram agendados alguma vez
+        const idSession = parseInt(req.sessionID);
+        const idE = await getID.empresa(idSession)
+        if (req.query) {
+            var clientes;
+            if (req.query.nome) {
+                
+                clientes = await prisma.cliente_empresa.findMany({
+                    where: {
+                        empresaId: {
+                            equals: idE
+                        },
+                        cliente: {
+                            nomeCliente: {
+                                startsWith: req.query.cpf
+                            }
+                        }
+                    },
+                    select:{
+                        cliente: true
+                    }
+                        
+                    
+                })
+            } else {
+                clientes = await prisma.cliente_empresa.findMany({
+                    where: {
+                        empresaId: {
+                            equals: idE
+                        },
+                        cliente: {
+                            nomeCliente: {
+                                equals: req.query.cpf
+                            }
+                        }
+                    },
+                    select:{
+                        cliente: true
+                    }                  
+                })
+            }
+        } else {
+            clientes = await prisma.$queryRaw`
+            SELECT cliente.* FROM cliente, cliente_empresa
+            WHERE cliente.idCliente=cliente_empresa.clienteId
+            AND cliente_empresa.empresaId=${idE}
+            `
+        }
+
+        res.json(clientes)
 
     },
     async filterCliente(req, res) {
@@ -76,50 +126,7 @@ module.exports = {
     },
     async filtrarClentes(req, res) {
         const ID = await getID.empresa(req.session.sessionId)
-        var clientes;
-        if (req.body.nome) {
 
-            clientes = await prisma.cliente.findMany({
-                where: {
-                    agendamento: {
-                        some: {
-                            empresaId: ID
-                        }
-                    },
-                    nomeCliente: {
-                        startsWith: req.body.nome
-                    }
-                }
-            });
-
-        } else if (req.body.telefone) {
-            clientes = await prisma.cliente.findMany({
-                where: {
-                    agendamento: {
-                        some: {
-                            empresaId: ID
-                        }
-                    },
-                    telCliente: {
-                        startsWith: req.body.telefone
-                    }
-                }
-            });
-        } else {
-
-            clientes = await prisma.cliente.findFirst({
-                where: {
-                    agendamento: {
-                        some: {
-                            empresaId: ID
-                        }
-                    },
-                    cpfCliente: {
-                        equals: req.body.cpf
-                    }
-                }
-            });
-        }
         var message = clientes ? 'Resultados correspondentes: ' : 'Nenhum resultado correspondente :('
 
         res.json({ message, clientes })

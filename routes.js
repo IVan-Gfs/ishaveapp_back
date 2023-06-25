@@ -14,10 +14,9 @@ router.get("/", (req, res) => {
 });
 
 //cliente routes
-router.get('/filtrar-clientes', Cliente.filtrarClentes)
 router.post("/cadastrar-cliente", Cliente.checkClient, Cliente.store);
 router.get("/consultar-clientes", Cliente.index);
-router.get('/filtrar-cliente', Cliente.filterCliente)
+
 
 //servico routes
 router.post("/cadastrar-servico", Servico.store);
