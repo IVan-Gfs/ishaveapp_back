@@ -23,6 +23,7 @@ module.exports = {
     async index(req, res){
         //Consultar todos os serviços de uma determinada empresa
         const idSession = parseInt(req.query.id)
+        console.log('Session: '+idSession)
         const idE = await getID.empresa(idSession) 
         var servicos = []
         var message;

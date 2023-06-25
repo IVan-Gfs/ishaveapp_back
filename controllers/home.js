@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 module.exports = {
     async getDataHome(req, res) { 
         const idSession = req.sessionID
+        console.log('sessão: '+idSession)
         //Obter dados do usuario ao logar
         const usuario = await prisma.usuarios.findFirst({
             where: {
@@ -21,7 +22,6 @@ module.exports = {
                 empresa: true
             }
         })
-  
         //A data de hoje será usada como condição para filtrar agendamentos do dia
         const dataHora = new Date().toLocaleDateString()
         const dataDehoje = dataHora.split('/').reverse().join('-')
