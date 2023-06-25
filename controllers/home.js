@@ -3,8 +3,8 @@ const { param } = require("../routes");
 const prisma = new PrismaClient();
 
 module.exports = {
-    async getDataHome(req, res) {
-        const idSession = parseInt(req.query.id)
+    async getDataHome(req, res) { 
+        const idSession = req.sessionID
         //Obter dados do usuario ao logar
         const usuario = await prisma.usuarios.findFirst({
             where: {

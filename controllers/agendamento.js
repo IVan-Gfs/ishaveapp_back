@@ -1,12 +1,12 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient;
-const getID = require('./resource/pegarId.js');
+const getID = require('./resource/pegarId');
 module.exports = {
     async store(req, res) {
         //Resgatar id da empesa a qual pertence o agendamento
-        const idE = await getID.empresa(req.session.sessionId)
-
+        const idE = await getID.empresa(req.body.idSession)
         console.log(req.body.idCliente)
+
         //Resgatar o id do cliente 
         let idC = req.body.idCliente
 
@@ -40,7 +40,8 @@ module.exports = {
     async index(req, res) {
 
         //Obter o id da empresa que está logada 
-        const ID = await getID.empresa(req.session.sessionId);
+        const idSession = parseInt(req.query.id)
+        const idE = await getID.empresa(idSession);
         console.log(ID)
 
         //Tratativa de condições de consulta dos agendamentos
@@ -53,7 +54,7 @@ module.exports = {
                 agendamentosBD = await prisma.$queryRaw`
             SELECT agendamento.*, cliente.nomeCliente
             FROM agendamento, cliente
-            WHERE DATE(horarioAgendamento) = ${data} AND empresaId = ${ID} 
+            WHERE DATE(horarioAgendamento) = ${data} AND empresaId = ${idE} 
             AND agendamento.clienteId=cliente.idCliente
             ORDER BY horarioAgendamento DESC`
 
@@ -63,7 +64,7 @@ module.exports = {
                 agendamentosBD = await prisma.$queryRaw`
             SELECT agendamento.*, cliente.nomeCliente
             FROM agendamento, cliente
-            WHERE MONTH(horarioAgendamento) = ${mês} AND YEAR(horarioAgendamento) = ${ano} AND empresaId = ${ID} 
+            WHERE MONTH(horarioAgendamento) = ${mês} AND YEAR(horarioAgendamento) = ${ano} AND empresaId = ${idE} 
             AND agendamento.clienteId=cliente.idCliente
            
             ORDER BY horarioAgendamento DESC`
@@ -73,7 +74,7 @@ module.exports = {
                 agendamentosBD = await prisma.$queryRaw`
             SELECT agendamento.*, cliente.nomeCliente
             FROM agendamento, cliente
-            WHERE YEAR(horarioAgendamento) = ${data} AND empresaId = ${ID} 
+            WHERE YEAR(horarioAgendamento) = ${data} AND empresaId = ${idE} 
             AND agendamento.clienteId=cliente.idCliente
             ORDER BY horarioAgendamento DESC`
             }
@@ -85,7 +86,7 @@ module.exports = {
              agendamentosBD = await prisma.$queryRaw`
             SELECT agendamento.*, cliente.nomeCliente
             FROM agendamento, cliente
-            WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${ID} 
+            WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${idE} 
             AND agendamento.clienteId=cliente.idCliente
             ORDER BY horarioAgendamento DESC`
         }
@@ -132,12 +133,12 @@ module.exports = {
     },
     async delete(req, res){
         const idSession = parseInt(req.query.id)
-        const idService = parseInt(req.query.idS)
-        const ID = getID.empresa(idSession)
-        await prisma.servico.delete({
+        const idAgendamento = parseInt(req.query.idA)
+        const ID = await getID.empresa(idSession)
+        await prisma.agendamento.delete({
             where:{
             empresaId: ID, 
-            idServico: idService
+            idAgendamento: idAgendamento
             }
         })
         res.json({message:'agendamento deletado com sucesso'})

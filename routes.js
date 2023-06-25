@@ -22,12 +22,13 @@ router.get('/filtrar-cliente', Cliente.filterCliente)
 //servico routes
 router.post("/cadastrar-servico", Servico.store);
 router.get("/consultar-servicos", Servico.index);
+router.delete("excluir-servico", Servico.delete)
 
 
 //agendamento routes 
 router.post('/agendar', Agendamento.store)
 router.get('/agendamentos', Agendamento.index)
-router.delete('/delete-agendamento', Agendamento.delete)
+router.delete('/excluir-agendamento', Agendamento.delete)
 
 
 //login routes 

@@ -1,7 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 const getID = require('./resource/pegarId');
-const agendamento = require('./agendamento');
 
 module.exports = {
     async store(req, res) {
