@@ -40,6 +40,45 @@ module.exports = {
         agendamento.Id_servicos = req.body.idServices
         res.json({ message: "Agendamento realizado com sucesso.", info_Ag: agendamento })
     },
+    async index(req, res) {
+
+        //Obter o id da empresa que está logada 
+        const id = await getID.empresa(req.session.sessionId);
+
+        //Converter data 
+        const data = req.body.data.split('/').reverse().join('-')
+
+        //Tratativa de condições de consulta dos agendamentos
+        var agendamentosBD = null
+        if (data.length == 10) {//Buscar pela data completa (ex: 08/02/2024 )
+
+            agendamentosBD = await prisma.$queryRaw`
+        SELECT agendamento.*, cliente.nomeCliente
+        FROM agendamento, cliente
+        WHERE DATE(horarioAgendamento) = ${data} AND empresaId = ${id} 
+        AND agendamento.clienteId=cliente.idCliente
+        ORDER BY horarioAgendamento DESC`
+
+        } else if (data.length == 7) {//Buscar pelo mês em algum ano (ex: 02/2024)
+
+            const [ano, mês] = data.split('-')
+            agendamentosBD = await prisma.$queryRaw`
+        SELECT agendamento.*, cliente.nomeCliente
+        FROM agendamento, cliente
+        WHERE MONTH(horarioAgendamento) = ${mês} AND YEAR(horarioAgendamento) = ${ano} AND empresaId = ${id} 
+        AND agendamento.clienteId=cliente.idCliente
+       
+        ORDER BY horarioAgendamento DESC`
+
+        } else {//Buscar somente pelo ano (ex: 2024)
+
+            agendamentosBD = await prisma.$queryRaw`
+        SELECT agendamento.*, cliente.nomeCliente
+        FROM agendamento, cliente
+        WHERE YEAR(horarioAgendamento) = ${data} AND empresaId = ${id} 
+        AND agendamento.clienteId=cliente.idCliente
+        ORDER BY horarioAgendamento DESC`
+        }
     
     async index(req, res) {
         const agendamentos = await prisma.agendamento.findMany();
