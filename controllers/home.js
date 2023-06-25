@@ -1,5 +1,4 @@
 const { PrismaClient } = require("@prisma/client");
-const agendamento = require("./agendamento");
 const { param } = require("../routes");
 const prisma = new PrismaClient();
 
