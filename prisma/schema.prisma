@@ -14,6 +14,8 @@ model agendamento {
   clienteId          Int
   empresaId          Int
   createdAt          DateTime               @default(now())
+  estado             String                 @default("PENDENTE") @db.VarChar(10)
+  observacao         String?                @db.Text
   cliente            cliente                @relation(fields: [clienteId], references: [idCliente])
   empresa            empresa                @relation(fields: [empresaId], references: [idEmpresa])
   AgSvc              agendamento_servicos[]
@@ -23,30 +25,19 @@ model agendamento {
 }
 
 model cliente {
-  idCliente       Int           @id @default(autoincrement())
-  nomeCliente     String        @db.VarChar(150)
-  telCliente      String        @db.VarChar(20)
-  cpfCliente      String?       @db.VarChar(15) @unique
-  emailCliente    String?       @db.VarChar(255)
-  dataNascCliente String?       @db.VarChar(10)
-  agendamento     agendamento[]
-}
-
-model prestador {
-  idPrestador       Int                 @id @default(autoincrement())
-  nomePrestador     String              @db.VarChar(150)
-  telPrestador      String              @db.VarChar(20)
-  cpfPrestador      String              @db.VarChar(15)
-  dataNascPrestador String?             @db.VarChar(10)
-  servicos          servico_prestador[]
-  usuario           usuarios[]
+  idCliente    Int           @id @default(autoincrement())
+  nomeCliente  String        @db.VarChar(150)
+  telCliente   String        @db.VarChar(20)
+  cpfCliente   String?       @unique @db.VarChar(15)
+  emailCliente String?       @db.VarChar(255)
+  agendamento  agendamento[]
 }
 
 model servico {
   idServico        Int                    @id @default(autoincrement())
   nomeServico      String                 @db.VarChar(50)
   precoServico     Decimal                @db.Decimal(6, 2)
-  descricaoServico String?                @db.VarChar(200)
+  descricaoServico String?                @db.VarChar(250)
   categoriaServico String?                @db.VarChar(100)
   empresaId        Int
   empresa          empresa                @relation(fields: [empresaId], references: [idEmpresa])
@@ -62,7 +53,7 @@ model empresa {
   nomeEmpresa String        @db.VarChar(255)
   telEmpresa  String        @db.VarChar(20)
   enderecoId  Int           @unique
-  fotoEmpresa String?        @db.VarChar(255)
+  fotoEmpresa String?       @db.VarChar(255)
   endereco    endereco      @relation(fields: [enderecoId], references: [idEndereco])
   usuario     usuarios[]
   agendamento agendamento[]
@@ -105,17 +96,14 @@ model servico_prestador {
 }
 
 model usuarios {
-  idUsuario    Int        @id @default(autoincrement())
-  nomeUsuario  String     @db.VarChar(30)
-  emailUsuario String     @unique @db.VarChar(255)
-  senhaUsuario String     @db.VarChar(255)
-  prestadorId  Int?
+  idUsuario    Int       @id @default(autoincrement())
+  nomeUsuario  String    @db.VarChar(30)
+  emailUsuario String    @unique @db.VarChar(255)
+  senhaUsuario String    @db.VarChar(255)
   empresaId    Int
-  prestador    prestador? @relation(fields: [prestadorId], references: [idPrestador])
-  empresa      empresa    @relation(fields: [empresaId], references: [idEmpresa])
+  empresa      empresa   @relation(fields: [empresaId], references: [idEmpresa])
   session      session[]
 
-  @@index([prestadorId])
   @@index([empresaId])
 }
 
@@ -140,4 +128,13 @@ model codAuth {
   codigo     String   @db.VarChar(6)
   email      String   @db.VarChar(255)
   expired_at DateTime
+}
+
+model prestador {
+  idPrestador       Int                 @id @default(autoincrement())
+  nomePrestador     String              @db.VarChar(150)
+  telPrestador      String              @db.VarChar(20)
+  cpfPrestador      String              @db.VarChar(15)
+  dataNascPrestador String?             @db.VarChar(10)
+  servicos          servico_prestador[]
 }

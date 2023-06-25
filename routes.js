@@ -17,30 +17,33 @@ router.get("/", (req, res) => {
 router.get('/filtrar-clientes', Cliente.filtrarClentes)
 router.post("/cadastrar-cliente", Cliente.checkClient, Cliente.store);
 router.get("/consultar-clientes", Cliente.index);
+router.get('/filtrar-cliente', Cliente.filterCliente)
 
 //servico routes
 router.post("/cadastrar-servico", Servico.store);
 router.get("/consultar-servicos", Servico.index);
-router.get("/filtrar-servicos", Servico.filter)
+
+
+//agendamento routes 
+router.post('/agendar', Agendamento.store)
+router.get('/agendamentos', Agendamento.index)
+router.delete('/delete-agendamento', Agendamento.delete)
+
+
+//login routes 
+router.post("/sign-up", User.userexists, User.sendData);
+router.get("/confirmMail", User.register);
+router.post("/sign-in", User.logar);
+router.delete("/logout", User.logout);
+router.get("/home", Home.getDataHome);
+
+
+//FORA DE USO ATUALMENTE: 
+router.get("/verify-cod", User.verifyCod);
 
 //prestador routes
 router.post("/cadastrar-prestador", Prestador.verify, Prestador.store);
 router.get("/consultar-prestadores", Prestador.index);
-
-//agendamento routes 
-router.post('/agendar', Agendamento.store)
-router.get('/filtrar-cliente', Cliente.filterCliente)
-router.get('/consultar-agendamentos', Agendamento.agendamentosDia)
-router.get('/filtrar-data', Agendamento.filtrarData)
-
-
-//login routes
-router.post("/sign-up", User.userexists, User.sendData);
-router.get("/confirmMail", User.register);
-router.get("/verify-cod", User.verifyCod);
-router.post("/sign-in", User.logar);
-router.delete("/logout", User.logout);
-router.get("/home:sessionID", Home.getDataHome);
 
 // testUpload
 const upload = require("./controllers/resource/multer");

@@ -10,6 +10,7 @@ module.exports = {
     const dados = req.body;
     dados.usuario.nomeUsuario = dados.empresa.nomeEmpresa
     const password = encryptPassword(dados.usuario.senhaUsuario);
+    console.log(password)
     dados.usuario.senhaUsuario = password;
 
     const dataAtual = new Date();

@@ -11,47 +11,49 @@ module.exports = {
             const preco = real+'.'+centavo
             req.body.precoServico = parseFloat(preco)
         }
-
-        const ID = await getID.empresa(req.session.sessionId)
+        const idSession = parseInt(req.query.id)
+        console.log(idSession)
+        const ID = await getID.empresa(idSession)
         req.body.empresaId = ID
         const servico = await prisma.servico.create({data: req.body})    
         res.json(servico)
     },
-
     async index(req, res){
         //Consultar todos os serviços de uma determinada empresa
-        const ID = await getID.empresa(req.session.sessionId) 
-        const servicos = await prisma.servico.findMany({
-            where:{
-                empresaId: ID
-            }
-        })
-        res.json(servicos);
-    },
-    async filter(req, res){
-        const ID = await getID.empresa(req.session.sessionId) 
-        const filtro = req.body
+        const idSession = parseInt(req.query.id)
+        const ID = await getID.empresa(idSession) 
         var servicos = []
-        if(filtro.nome){
+        var message;
+        if(req.query){
+            const filtro = req.query
+            if(filtro.nome){
+                 servicos = await prisma.servico.findMany({
+                    where:{
+                        empresaId: ID,
+                        nomeServico:{
+                            startsWith: filtro.nome
+                        }
+                    }
+                })
+            }else{
+                servicos = await prisma.servico.findMany({
+                    where:{
+                        empresaId: ID,
+                        categoriaServico: {
+                            equals: filtro.categoria
+                        }
+                    }
+                })
+            }
+        }else{
              servicos = await prisma.servico.findMany({
                 where:{
-                    empresaId: ID,
-                    nomeServico:{
-                        startsWith: filtro.nome
-                    }
+                    empresaId: ID
                 }
             })
-        }else{
-            servicos = await prisma.servico.findMany({
-                where:{
-                    empresaId: ID,
-                    categoriaServico: {
-                        equals: filtro.categoria
-                    }
-                }
-            })
+            message = !servicos ? 'Você ainda não cadastrou nenhum servico.' : ''
         }
-        var message = servicos ? 'Resultados correspondentes: ' : 'Nenhum resultado correspondente :('
-        res.json({message, servicos})
+         message = servicos ? 'Resultados correspondentes: ' : 'Nenhum resultado correspondente :('
+        res.json(servicos);
     }
 }
