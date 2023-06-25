@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 module.exports = {
     async getDataHome(req, res) { 
         const idSession = req.sessionID
-        console.log('sessão: '+idSession)
         //Obter dados do usuario ao logar
         const usuario = await prisma.usuarios.findFirst({
             where: {

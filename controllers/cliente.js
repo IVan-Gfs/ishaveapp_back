@@ -54,7 +54,10 @@ module.exports = {
         //Busca por todos os clientes que foram agendados alguma vez
         const idSession = parseInt(req.sessionID);
         const idE = await getID.empresa(idSession)
-        if (req.query) {
+        var clientes = []
+        
+        if (req.query.nome || req.query.cpf) {
+            console.log('test1')
             var clientes;
             if (req.query.nome) {
                 
@@ -93,13 +96,19 @@ module.exports = {
                 })
             }
         } else {
-            clientes = await prisma.$queryRaw`
-            SELECT cliente.* FROM cliente, cliente_empresa
-            WHERE cliente.idCliente=cliente_empresa.clienteId
-            AND cliente_empresa.empresaId=${idE}
-            `
+           var idClientes = await prisma.$queryRaw`
+            SELECT * FROM cliente_empresa 
+            WHERE empresaId = ${idE}
+            `  
+            for(let idCliente of idClientes ){
+               var cliente = await prisma.$queryRaw`
+                SELECT * FROM cliente 
+                WHERE idCliente = ${idCliente.clienteId}
+                `
+                clientes.push(cliente[0])
+            
+            }
         }
-
         res.json(clientes)
 
     },

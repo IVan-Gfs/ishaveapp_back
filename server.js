@@ -27,12 +27,11 @@ app.use(
     },
   })
 );
-
 app.use((req, res, next)=>{
   idHeader = parseInt(req.headers['x-session-id']) 
   const sessionId = idHeader ? idHeader : parseInt(req.query.id) 
   req.sessionID = sessionId
-  console.log(req.sessionID)
+  console.log("SESSÃO DO USUÁRIO: "+req.sessionID)
   next();
 })
 app.use(router);
