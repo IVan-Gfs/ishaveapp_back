@@ -16,7 +16,6 @@ module.exports = {
                 horarioAgendamento: req.body.data,
                 observacao: req.body.observacao,
                 clienteId: idC,
-                prestadorId: req.body.idPrestador,
                 empresaId: idE
 
             }
