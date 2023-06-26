@@ -78,8 +78,8 @@ module.exports = {
             ORDER BY horarioAgendamento DESC`
             }
         } else {
-            const dataHora = new Date().toLocaleDateString()
-            const dataDehoje = dataHora.split('/').reverse().join('-')
+            // const dataHora = new Date().toLocaleDateString()
+            // const dataDehoje = dataHora.split('/').reverse().join('-')
 
             //Buscar somente os agendamentos para o dia atual 
              agendamentosBD = await prisma.$queryRaw`
