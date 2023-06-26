@@ -6,7 +6,7 @@ const emailValidator = require('email-validator');
 const path = require('path');
 
 module.exports = {
-  async sendData(req, res) {
+  async sendData(req, res) {//Rota de envio de dados para o e-mail para confirmação de cadastro
     const dados = req.body;
     dados.usuario.nomeUsuario = dados.empresa.nomeEmpresa
     const password = encryptPassword(dados.usuario.senhaUsuario);
@@ -69,8 +69,7 @@ module.exports = {
     }    
     
   },
-  async register(req, res) {
-    
+  async register(req, res) { //Rota de confirmação de cadastro
     
     //Antes do cadastro, desencripitar os dados:
     const todosDados = decryiptURL(req.query.d, req.query.v)
@@ -130,7 +129,7 @@ module.exports = {
 
     res.send({ message, registered, expired })
   },
-  async userexists(req, res, next) {
+  async userexists(req, res, next) {//Middleware de verificação de existencia do usuário
     const qtdUserWithData = await prisma.usuarios.count({
       where: {
         emailUsuario: req.body.usuario.emailUsuario
@@ -142,25 +141,6 @@ module.exports = {
     } else {
       next();
     }
-  },
-  async otp(req, res, next) {
-    var code = gerarOTP(6)
-
-    prisma.codAuth.create({
-      data: {
-        codigo: code,
-        email: req.body.usuario.emailUsuario,
-      }
-    })
-  },
-  async verifyCod(req, res) {
-    const cod = await prisma.codAuth.findMany()
-    if (cod[cod.length - 1] === req.code) {
-      res.send("<h1>Código correto</h1>")
-    } else {
-      res.send("<h1>Código inválido</h1>")
-    }
-
   },
   async logar(req, res) {
     
@@ -207,3 +187,17 @@ module.exports = {
     res.status(401).json({message:'Logout efetuado'})
   }
 };
+
+
+
+
+// async otp(req, res, next) {
+//   var code = gerarOTP(6)
+
+//   prisma.codAuth.create({
+//     data: {
+//       codigo: code,
+//       email: req.body.usuario.emailUsuario,
+//     }
+//   })
+// },

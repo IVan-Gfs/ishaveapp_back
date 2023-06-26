@@ -13,12 +13,12 @@ module.exports = {
             req.body.precoServico = parseFloat(preco)
         }
 
-        const idSession = parseInt(req.query.id)
-        console.log(idSession)
+        const idSession = parseInt(req.sessionID)
         const idE = await getID.empresa(idSession)
         req.body.empresaId = idE
         const servico = await prisma.servico.create({data: req.body})    
         res.json(servico)
+
     },
     async index(req, res){
         //Consultar todos os serviços de uma determinada empresa

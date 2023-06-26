@@ -1,5 +1,4 @@
 const { PrismaClient } = require("@prisma/client");
-const { param } = require("../routes");
 const prisma = new PrismaClient();
 
 module.exports = {
@@ -90,3 +89,4 @@ module.exports = {
         }
     }
 }
+

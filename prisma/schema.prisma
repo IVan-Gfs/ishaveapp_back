@@ -34,31 +34,6 @@ model cliente {
   agendamento  agendamento[]
   cliente_empresa cliente_empresa[]
 }
-model cliente_empresa {
-  idCliente_empresa Int @id @default(autoincrement())
-  clienteId         Int
-  empresaId         Int 
-  cliente      cliente @relation(fields: [clienteId], references: [idCliente])
-  empresa      empresa @relation(fields: [empresaId], references: [idEmpresa])
-  @@index([clienteId])
-  @@index([empresaId])
-}
-
-model servico {
-  idServico        Int                    @id @default(autoincrement())
-  nomeServico      String                 @db.VarChar(50)
-  precoServico     Decimal                @db.Decimal(6, 2)
-  descricaoServico String?                @db.VarChar(250)
-  categoriaServico String?                @db.VarChar(100)
-  estado           String                 @db.VarChar(1) @default("A")
-  empresaId        Int
-  empresa          empresa                @relation(fields: [empresaId], references: [idEmpresa])
-  prestadores      servico_prestador[]
-  AgSvc            agendamento_servicos[]
-
-  @@index([empresaId])
-}
-
 model empresa {
   idEmpresa   Int           @id @default(autoincrement())
   cnpjEmpresa String        @db.VarChar(25)
@@ -86,6 +61,32 @@ model endereco {
   empresa    empresa[]
 }
 
+model servico {
+  idServico        Int                    @id @default(autoincrement())
+  nomeServico      String                 @db.VarChar(50)
+  precoServico     Decimal                @db.Decimal(6, 2)
+  descricaoServico String?                @db.VarChar(250)
+  categoriaServico String?                @db.VarChar(100)
+  estado           String                 @db.VarChar(1) @default("A")
+  empresaId        Int
+  empresa          empresa                @relation(fields: [empresaId], references: [idEmpresa])
+  prestadores      servico_prestador[]
+  AgSvc            agendamento_servicos[]
+
+  @@index([empresaId])
+}
+
+model cliente_empresa {
+  idCliente_empresa Int @id @default(autoincrement())
+  clienteId         Int
+  empresaId         Int 
+  cliente      cliente @relation(fields: [clienteId], references: [idCliente])
+  empresa      empresa @relation(fields: [empresaId], references: [idEmpresa])
+  @@index([clienteId])
+  @@index([empresaId])
+}
+
+
 model agendamento_servicos {
   idAgSvc       Int         @id @default(autoincrement())
   agendamentoId Int        
@@ -97,16 +98,7 @@ model agendamento_servicos {
   @@index([servicoId])
 }
 
-model servico_prestador {
-  idSvcPtd    Int       @id @default(autoincrement())
-  servicoId   Int
-  prestadorId Int
-  prestador   prestador @relation(fields: [prestadorId], references: [idPrestador])
-  servico     servico   @relation(fields: [servicoId], references: [idServico])
 
-  @@index([servicoId])
-  @@index([prestadorId])
-}
 
 model usuarios {
   idUsuario    Int       @id @default(autoincrement())
@@ -135,6 +127,20 @@ model urlConfirm {
   url        String   @db.Text
   expires_at DateTime
 }
+
+
+
+model servico_prestador {
+  idSvcPtd    Int       @id @default(autoincrement())
+  servicoId   Int
+  prestadorId Int
+  prestador   prestador @relation(fields: [prestadorId], references: [idPrestador])
+  servico     servico   @relation(fields: [servicoId], references: [idServico])
+
+  @@index([servicoId])
+  @@index([prestadorId])
+}
+
 
 model codAuth {
   idCodAuth  Int      @id @default(autoincrement())
