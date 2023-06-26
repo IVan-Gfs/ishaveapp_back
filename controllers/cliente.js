@@ -106,7 +106,7 @@ module.exports = {
                 WHERE idCliente = ${idCliente.clienteId}
                 AND estado = 'A'
                 `
-                if(cliente){
+                if(cliente != null){
                   clientes.push(cliente[0])
                   }
                 
