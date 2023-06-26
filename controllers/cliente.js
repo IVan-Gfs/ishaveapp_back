@@ -106,7 +106,10 @@ module.exports = {
                 WHERE idCliente = ${idCliente.clienteId}
                 AND estado = 'A'
                 `
-                clientes.push(cliente[0])
+                if(cliente){
+                  clientes.push(cliente[0])
+                  }
+                
             
             }
         }
