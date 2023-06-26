@@ -31,7 +31,9 @@ module.exports = {
         SELECT agendamento.*, cliente.nomeCliente
         FROM agendamento, cliente
         WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${id} 
+        AND agendamento.estado = 'PENDENTE'
         AND agendamento.clienteId=cliente.idCliente
+
         ORDER BY horarioAgendamento DESC`   
         //Estruturar array de agendamentos que será enviado como resposta 
         const agendamentos = []

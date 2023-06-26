@@ -40,9 +40,9 @@ module.exports = {
     async index(req, res) {
 
         //Obter o id da empresa que está logada 
-        const idSession = parseInt(req.query.id)
+        const idSession = parseInt(req.sessionID)
         const idE = await getID.empresa(idSession);
-        console.log(ID)
+        
 
         //Tratativa de condições de consulta dos agendamentos
         var agendamentosBD = null
@@ -86,8 +86,9 @@ module.exports = {
              agendamentosBD = await prisma.$queryRaw`
             SELECT agendamento.*, cliente.nomeCliente
             FROM agendamento, cliente
-            WHERE DATE(horarioAgendamento) = ${dataDehoje} AND empresaId = ${idE} 
+            WHERE empresaId = ${idE} 
             AND agendamento.clienteId=cliente.idCliente
+            AND agendamento.estado = 'PENDENTE'
             ORDER BY horarioAgendamento DESC`
         }
 
@@ -132,15 +133,17 @@ module.exports = {
 
     },
     async delete(req, res){
-        const idSession = parseInt(req.query.id)
-        const idAgendamento = parseInt(req.query.idA)
-        const ID = await getID.empresa(idSession)
-        await prisma.agendamento.delete({
+        
+        const idA = parseInt(req.query.idA)
+
+        await prisma.agendamento.update({
             where:{
-            empresaId: ID, 
-            idAgendamento: idAgendamento
+                idAgendamento: idA
+            },
+            data:{
+                estado: 'CANCELADO'
             }
         })
-        res.json({message:'agendamento deletado com sucesso'})
+        res.json({message:'Agendamento deletado com sucesso'})
     }
 }

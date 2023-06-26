@@ -49,6 +49,7 @@ model servico {
   precoServico     Decimal                @db.Decimal(6, 2)
   descricaoServico String?                @db.VarChar(250)
   categoriaServico String?                @db.VarChar(100)
+  estado           String                 @db.VarChar(2) @default("A")
   empresaId        Int
   empresa          empresa                @relation(fields: [empresaId], references: [idEmpresa])
   prestadores      servico_prestador[]
@@ -86,7 +87,7 @@ model endereco {
 
 model agendamento_servicos {
   idAgSvc       Int         @id @default(autoincrement())
-  agendamentoId Int
+  agendamentoId Int        
   servicoId     Int
   agendamento   agendamento @relation(fields: [agendamentoId], references: [idAgendamento])
   servico       servico     @relation(fields: [servicoId], references: [idServico])

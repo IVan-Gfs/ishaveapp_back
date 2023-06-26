@@ -141,5 +141,4 @@ module.exports = {
         res.json({ message, clientes })
     }
 
-
 }

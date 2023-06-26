@@ -21,7 +21,7 @@ router.get("/consultar-clientes", Cliente.index);
 //servico routes
 router.post("/cadastrar-servico", Servico.store);
 router.get("/consultar-servicos", Servico.index);
-router.delete("excluir-servico", Servico.delete)
+router.delete("/excluir-servico", Servico.delete)
 
 
 //agendamento routes 

@@ -35,7 +35,8 @@ module.exports = {
                         empresaId: idE,
                         nomeServico:{
                             startsWith: filtro.nome
-                        }
+                        },
+                        estado: 'A'
                     }
                 })
             }else{
@@ -44,14 +45,16 @@ module.exports = {
                         empresaId: idE,
                         categoriaServico: {
                             equals: filtro.categoria
-                        }
+                        }, 
+                        estado: 'A'
                     }
                 })
             }
         }else{
              servicos = await prisma.servico.findMany({
                 where:{
-                    empresaId: idE
+                    empresaId: idE,
+                    estado: 'A'
                 }
             })
             message = !servicos ? 'Você ainda não cadastrou nenhum servico.' : ''
@@ -60,20 +63,18 @@ module.exports = {
         res.json(servicos);
     },
     async delete(req, res){
-
-        const idSession = parseInt(req.query.id)
+        
         const idS = parseInt(req.query.idS);
-        const idE = await getID.empresa(idSession);
 
-        await prisma.servico.delete({
+        await prisma.servico.update({
             where:{
-                empresaId: idE,
                 idServico: idS
+            },
+            data:{
+                estado: 'I'
             }
         })
 
         res.json({message: "Serviço deletado com sucesso."})
-
-
     }
 }
