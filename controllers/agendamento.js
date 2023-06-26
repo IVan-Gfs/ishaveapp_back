@@ -11,7 +11,7 @@ module.exports = {
         let idC = req.body.idCliente
 
         // cadastrar agendamento
-        const dthISO = new Date().toISOString(req.body.data)
+        const dthISO = new Date(req.body.data).toISOString()
         const agendamento = await prisma.agendamento.create({
             data: {
                 horarioAgendamento: dthISO,
