@@ -13,30 +13,27 @@ router.get("/", (req, res) => {
   res.json({ message: "Hello world2" });
 });
 
-//cliente routes
+//Rotas de cliente
 router.post("/cadastrar-cliente", Cliente.checkClient, Cliente.store);
 router.get("/consultar-clientes", Cliente.index);
+router.delete("/excluir-cliente", Cliente.delete)
 
-
-//servico routes
+//Rotas de Serviço 
 router.post("/cadastrar-servico", Servico.store);
 router.get("/consultar-servicos", Servico.index);
 router.delete("/excluir-servico", Servico.delete)
 
-
-//agendamento routes 
+//Rotas de agendamento 
 router.post('/agendar', Agendamento.store)
 router.get('/agendamentos', Agendamento.index)
 router.delete('/excluir-agendamento', Agendamento.delete)
 
-
-//login routes 
+//Rotas de usuário 
 router.post("/sign-up", User.userexists, User.sendData);
 router.get("/confirmMail", User.register);
 router.post("/sign-in", User.logar);
 router.delete("/logout", User.logout);
 router.get("/home", Home.getDataHome);
-
 
 //FORA DE USO ATUALMENTE: 
 router.get("/verify-cod", User.verifyCod);

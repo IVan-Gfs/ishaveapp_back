@@ -30,6 +30,7 @@ model cliente {
   telCliente   String        @db.VarChar(20)
   cpfCliente   String?       @unique @db.VarChar(15)
   emailCliente String?       @db.VarChar(255)
+  estado       String?       @db.VarChar(1) @default("A")
   agendamento  agendamento[]
   cliente_empresa cliente_empresa[]
 }
@@ -49,7 +50,7 @@ model servico {
   precoServico     Decimal                @db.Decimal(6, 2)
   descricaoServico String?                @db.VarChar(250)
   categoriaServico String?                @db.VarChar(100)
-  estado           String                 @db.VarChar(2) @default("A")
+  estado           String                 @db.VarChar(1) @default("A")
   empresaId        Int
   empresa          empresa                @relation(fields: [empresaId], references: [idEmpresa])
   prestadores      servico_prestador[]

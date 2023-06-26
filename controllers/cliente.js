@@ -104,6 +104,7 @@ module.exports = {
                var cliente = await prisma.$queryRaw`
                 SELECT * FROM cliente 
                 WHERE idCliente = ${idCliente.clienteId}
+                AND estado = 'A'
                 `
                 clientes.push(cliente[0])
             
@@ -112,33 +113,19 @@ module.exports = {
         res.json(clientes)
 
     },
-    async filterCliente(req, res) {
+    async delete(req, res){
 
-        const filtro = req.body;
-        var cliente = [];
-        if (filtro.cpf) {
-            console.log(filtro.cpf)
-            cliente = await prisma.cliente.findUnique({
-                where: { cpfCliente: filtro.cpf }
-            })
-        } else {
-            cliente = await prisma.cliente.findMany({
-                where: {
-                    nomeCliente: {
-                        startsWith: filtro.nome
-                    }
-                }
-            })
-        }
-        const message = cliente.length ? 'Resultados correspondentes:' : 'Nenhum resultado correspondente.'
-        res.json({ message, cliente })
-    },
-    async filtrarClentes(req, res) {
-        const ID = await getID.empresa(req.session.sessionId)
+        const idC = parseInt(req.query.idC);
 
-        var message = clientes ? 'Resultados correspondentes: ' : 'Nenhum resultado correspondente :('
-
-        res.json({ message, clientes })
+        await prisma.cliente.update({
+            where:{
+                idCliente: idC
+            },
+            data:{
+                estado: 'I'
+            }
+        })
+        res.json({message:"Cliente excluido com sucesso"})
     }
 
 }
