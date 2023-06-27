@@ -20,19 +20,16 @@ module.exports = {
 
             }
         })
-
-        //associar um ou mais serviços ao agendamento 
-        if (req.body.idServices) {
-            req.body.idServices.forEach(async (servicoId) => {
-                await prisma.agendamento_servicos.create({
+        console.log(req.body.idServices)
+        //associar um ou mais serviços ao agendamento   
+            await prisma.agendamento_servicos.create({
                     data: {
                         agendamentoId: agendamento.idAgendamento,
-                        servicoId: servicoId
+                        servicoId: req.body.idServices[0]
                     }
                 })
-            });
-        }
-
+            console.log(req.body)
+                
         agendamento.Id_servicos = req.body.idServices
         res.json({ message: "Agendamento realizado com sucesso.", info_Ag: agendamento })
     },

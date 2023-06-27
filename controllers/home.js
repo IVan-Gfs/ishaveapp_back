@@ -27,7 +27,6 @@ module.exports = {
             }
         })
         //Buscar todos os agendamentos
-        console.log('ID da empresa: '+idE)
         const idE = usuario.empresa.idEmpresa
         const agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente
@@ -44,21 +43,26 @@ module.exports = {
             const data = dataHora.toLocaleDateString('pt-br');
             const horario = dataHora.toLocaleTimeString('pt-br').substring(0,5)     
 
-            const servicos = await prisma.agendamento_servicos.findMany({
-                where: {
-                    agendamentoId: agendamento.idAgendamento
-                },
-                include: {
-                    servico: {
-                        select: {
-                            nomeServico: true,
-                            precoServico: true,
-                            descricaoServico: true
-                        }
-                    }
-                }
-            })
-
+            // const servicos = await prisma.agendamento_servicos.findMany({
+            //     where: {
+            //         agendamentoId: agendamento.idAgendamento
+            //     },
+            //     include: {
+            //         servico: {
+            //             select: {
+            //                 nomeServico: true,
+            //                 precoServico: true,
+            //                 descricaoServico: true
+            //             }
+            //         }
+            //     }
+            // })
+            const servicos = await prisma.$queryRaw`
+            SELECT servico.* FROM servico, agendamento_servicos 
+            WHERE servico.idServico=agendamento_servicos.servicoId
+            AND agendamento_servicos.agendamentoId = ${agendamento.idAgendamento}
+            `
+            console.log(servicos)
             const objAg = {
                 idA: agendamento.idAgendamento,
                 nome: agendamento.nomeCliente,
@@ -66,17 +70,24 @@ module.exports = {
                 horario: horario,
                 servicos: []
             }
-
-            for (let i = 0; i < servicos.length; i++) {
-                const preco = parseFloat(servicos[i].servico.precoServico)
-                const servico = {
-                    nome: servicos[i].servico.nomeServico,
-                    preco: preco.toFixed(2),
-                    descricao: servicos[i].servico.descricaoServico,
+            if(servicos){
+                try{
+                    const preco = parseFloat(servicos[0].precoServico)
+                    const servico = {
+                        nome: servicos[0].nomeServico,
+                        preco: preco.toFixed(2),
+                        descricao: servicos[0].descricaoServico,
+                    }
+    
+                    objAg.servicos.push(servico)
+                }catch(e){
+                    console.log('Não há serviços')
                 }
-
-                objAg.servicos.push(servico)
+                    
+                
             }
+           
+    
             agendamentos.push(objAg)
         }
         //Enviar os dados para a home
