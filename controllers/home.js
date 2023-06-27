@@ -62,7 +62,6 @@ module.exports = {
             WHERE servico.idServico=agendamento_servicos.servicoId
             AND agendamento_servicos.agendamentoId = ${agendamento.idAgendamento}
             `
-            console.log(servicos)
             const objAg = {
                 idA: agendamento.idAgendamento,
                 nome: agendamento.nomeCliente,
@@ -70,7 +69,7 @@ module.exports = {
                 horario: horario,
                 servicos: []
             }
-            if(servicos){
+            if(servicos.length){
                 try{
                     const preco = parseFloat(servicos[0].precoServico)
                     const servico = {
