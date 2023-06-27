@@ -53,11 +53,11 @@ module.exports = {
             })
 
             const objAg = {
+                idA: agendamento.idAgendamento,
                 nome: agendamento.nomeCliente,
                 data: data,
                 horario: horario,
-                servicos: [],
-                profissional: agendamento.nomePrestador
+                servicos: []
             }
 
             for (let i = 0; i < servicos.length; i++) {
