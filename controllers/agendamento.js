@@ -97,8 +97,8 @@ module.exports = {
 
             const dataHora = agendamento.horarioAgendamento
 
-            const data = new Date(dataHora).toLocaleDateString();
-            const horario = new Date(dataHora).toISOString().substring(11, 16)
+            const data = dataHora.toLocaleDateString('pt-br');
+            const horario = dataHora.toLocaleTimeString('pt-br').substring(0, 5)
 
             const objAg = {//estrutura de objeto que representa cada agendamento
                 nome: agendamento.nomeCliente,
