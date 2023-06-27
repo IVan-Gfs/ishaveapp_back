@@ -20,16 +20,12 @@ module.exports = {
                 empresa: true
             }
         })
-        //A data de hoje será usada como condição para filtrar agendamentos do dia
-        // const dataHora = new Date().toLocaleDateString()
-        // const dataDehoje = dataHora.split('/').reverse().join('-')
-
-        //Buscar somente os agendamentos para o dia atual 
-        const id = usuario.empresa.idEmpresa
+        //Buscar todos os agendamentos
+        const idE = usuario.empresa.idEmpresa
         const agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente
         FROM agendamento, cliente
-        WHERE  empresaId = ${id} 
+        WHERE  empresaId = ${idE} 
         AND agendamento.clienteId=cliente.idCliente
         AND agendamento.estado = 'PENDENTE'
         ORDER BY horarioAgendamento DESC`   
@@ -38,8 +34,8 @@ module.exports = {
         for (const agendamento of agendamentosBD) {
 
             const dataHora = agendamento.horarioAgendamento
-            const data = new Date(dataHora).toLocaleDateString();
-            const horario = new Date(dataHora).toISOString().substring(11,16)     
+            const data = dataHora.toLocaleDateString('pt-br');
+            const horario = dataHora.toLocaleTimeString('pt-br').substring(0,5)     
 
             const servicos = await prisma.agendamento_servicos.findMany({
                 where: {
