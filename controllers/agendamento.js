@@ -4,8 +4,8 @@ const getID = require('./resource/pegarId');
 module.exports = {
     async store(req, res) {
         //Resgatar id da empesa a qual pertence o agendamento
-        const idE = await getID.empresa(req.body.idSession)
-        console.log(req.body.idCliente)
+        const idSession = parseInt(req.sessionID)
+        const idE = await getID.empresa(idSession)
 
         //Resgatar o id do cliente 
         let idC = req.body.idCliente
