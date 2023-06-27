@@ -1,9 +1,15 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const getID = require('./resource/pegarId');
 
 module.exports = {
-    async getDataHome(req, res) { 
-        const idSession = req.sessionID
+    async getDataHome(req, res) {
+        
+        const idSession = parseInt(req.sessionID)
+        console.log(idSession)
+        const idE2 = await getID.empresa(idSession)
+        console.log('ID Empresa:'+ idE2)
+        
         //Obter dados do usuario ao logar
         const usuario = await prisma.usuarios.findFirst({
             where: {
@@ -21,6 +27,7 @@ module.exports = {
             }
         })
         //Buscar todos os agendamentos
+        console.log('ID da empresa: '+idE)
         const idE = usuario.empresa.idEmpresa
         const agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente
@@ -53,11 +60,11 @@ module.exports = {
             })
 
             const objAg = {
+                idA: agendamento.idAgendamento,
                 nome: agendamento.nomeCliente,
                 data: data,
                 horario: horario,
-                servicos: [],
-                profissional: agendamento.nomePrestador
+                servicos: []
             }
 
             for (let i = 0; i < servicos.length; i++) {
