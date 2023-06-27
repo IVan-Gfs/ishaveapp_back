@@ -23,6 +23,7 @@ module.exports = {
             }
         })
         //Buscar todos os agendamentos
+        console.log('ID da empresa: '+idE)
         const idE = usuario.empresa.idEmpresa
         const agendamentosBD = await prisma.$queryRaw`
         SELECT agendamento.*, cliente.nomeCliente
